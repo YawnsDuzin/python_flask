@@ -44,10 +44,10 @@
 터미널/명령 프롬프트에서 실행:
 ```bash
 # 사용자 이름 설정 (GitHub 사용자명과 동일하게)
-git config --global user.name "Your Name"
+git config --global user.name "yawnsduzin"
 
 # 이메일 설정 (GitHub 계정 이메일과 동일하게)
-git config --global user.email "your.email@example.com"
+git config --global user.email "yawnsduzin@gmail.com"
 
 # 설정 확인
 git config --list
@@ -95,6 +95,7 @@ ssh -T git@github.com
 SSH 대신 HTTPS를 사용하려면:
 
 ### 4.1 Token 생성
+# 2025.10.01
 1. GitHub.com → Settings → Developer settings
 2. Personal access tokens → Tokens (classic)
 3. "Generate new token" → Generate new token (classic)
@@ -133,7 +134,7 @@ git branch -M main
 git remote add origin git@github.com:your-username/itlog-device-manager.git
 
 # 또는 HTTPS 방식
-git remote add origin https://github.com/your-username/itlog-device-manager.git
+git remote add origin https://github.com/YawnsDuzin/python_flask.git
 
 # 연결 확인
 git remote -v
@@ -164,7 +165,7 @@ git add .
 git status
 
 # 첫 커밋 생성
-git commit -m "Initial commit: ITLog Device Manager project setup"
+git commit -m "Initial commit: python flask project"
 ```
 
 ### 5.5 GitHub에 푸시
