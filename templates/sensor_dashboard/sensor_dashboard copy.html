@@ -1,0 +1,1156 @@
+{% extends "base.html" %}
+
+{% block title %}센서 대시보드 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-broadcast-tower"></i> 센서 대시보드</h2>
+    <div>
+        <button id="toggleConnection" class="btn btn-outline-success" style="padding: 8px 16px; font-size: 1.1rem; min-width: 110px;">
+            <i class="fas fa-play"></i> 연결 시작
+        </button>
+        <span id="connectionStatus" class="badge bg-secondary ms-2" style="min-width: 80px; text-align: center;">
+            <i class="fas fa-circle"></i> 연결 대기
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 연결 정보 카드 -->
+    <div class="col-md-12 mb-2">
+        <div class="card border-0 bg-light" style="border-radius: 8px;">
+            <div class="card-body py-2 px-3">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <small class="text-muted">서버:</small> 
+                        <span id="serverAddress" class="small text-secondary">--</span>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">상태:</small> 
+                        <span id="wsStatus" class="small text-danger">미연결</span>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">업데이트:</small> 
+                        <span id="lastUpdate" class="small text-secondary">-</span>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted">수신:</small> 
+                        <span id="dataCount" class="small text-secondary">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 동적 센서 카드 컨테이너 -->
+    <div id="sensor-cards-container" class="col-md-12 mb-3">
+        <div class="row" id="sensor-cards-row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-satellite-dish fa-3x mb-3"></i>
+                        <h5>센서 데이터 대기 중...</h5>
+                        <p>연결 시작 버튼을 클릭하여 실시간 센서 데이터를 확인하세요.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 데이터 로그 -->
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3">
+                        <i class="fas fa-angle-right me-2"></i>데이터 로그
+                    </h5>
+                    <button id="logToggleBtn" class="btn btn-sm btn-outline-light me-2" onclick="toggleDataLog();">
+                        <i id="logToggleIcon" class="fas fa-chevron-down" style="transition: transform 0.3s ease;"></i>
+                    </button>
+                </div>
+                <button id="clearLog" class="btn btn-sm btn-outline-light" onclick="clearLogOnly();">
+                    <i class="fas fa-trash"></i> 로그 지우기
+                </button>
+            </div>
+            <div class="collapse" id="dataLogCollapse">
+                <div class="card-body bg-dark text-light p-0">
+                    <div id="dataLogContainer" style="height: 240px; overflow-y: auto; font-family: 'Courier New', monospace;">
+                        <pre id="dataLog" class="mb-0 p-3" style="font-size: 0.9rem; line-height: 1.5; background: transparent; border: none;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+/* 라이트/다크 모드 대응 센서 데이터 스타일 */
+
+/* 라이트 모드 (기본) */
+.sensor-data-card {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+}
+
+.sensor-field-name {
+    color: #495057 !important;
+}
+
+.sensor-data-value {
+    background-color: #ffffff !important;
+    border: 2px solid #6c757d !important;
+    color: #212529 !important;
+    text-shadow: none !important;
+}
+
+.sensor-badge-value {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+.sensor-unit-label {
+    color: #6c757d !important;
+}
+
+/* 다크 모드 스타일 (data-theme 속성 기반) */
+[data-theme="dark"] .sensor-data-card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+[data-theme="dark"] .sensor-field-name {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .sensor-data-value {
+    background-color: #2d2d2d !important;
+    border: 2px solid #555 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+[data-theme="dark"] .sensor-badge-value {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+[data-theme="dark"] .sensor-unit-label {
+    color: #adb5bd !important;
+}
+
+/* Bootstrap data-bs-theme 지원 */
+[data-bs-theme="dark"] .sensor-data-card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+[data-bs-theme="dark"] .sensor-field-name {
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .sensor-data-value {
+    background-color: #2d2d2d !important;
+    border: 2px solid #555 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+[data-bs-theme="dark"] .sensor-badge-value {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+[data-bs-theme="dark"] .sensor-unit-label {
+    color: #adb5bd !important;
+}
+
+/* Bootstrap 다크 모드 클래스 대응 */
+.dark-mode .sensor-data-card,
+body.dark-mode .sensor-data-card,
+html.dark-mode .sensor-data-card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+.dark-mode .sensor-field-name,
+body.dark-mode .sensor-field-name,
+html.dark-mode .sensor-field-name {
+    color: #e0e0e0 !important;
+}
+
+.dark-mode .sensor-data-value,
+body.dark-mode .sensor-data-value,
+html.dark-mode .sensor-data-value {
+    background-color: #2d2d2d !important;
+    border: 2px solid #555 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+.dark-mode .sensor-badge-value,
+body.dark-mode .sensor-badge-value,
+html.dark-mode .sensor-badge-value {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+.dark-mode .sensor-unit-label,
+body.dark-mode .sensor-unit-label,
+html.dark-mode .sensor-unit-label {
+    color: #adb5bd !important;
+}
+
+/* CSS 변수를 사용한 다크 모드 대응 (CSS Custom Properties) */
+@media (prefers-color-scheme: dark) {
+    .sensor-data-card {
+        background-color: #1e1e1e !important;
+        border: 1px solid #333 !important;
+    }
+
+    .sensor-field-name {
+        color: #e0e0e0 !important;
+    }
+
+    .sensor-data-value {
+        background-color: #2d2d2d !important;
+        border: 2px solid #555 !important;
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+    }
+
+    .sensor-badge-value {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+    }
+
+    .sensor-unit-label {
+        color: #adb5bd !important;
+    }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+    .sensor-data-value {
+        border-width: 3px !important;
+        text-shadow: none !important;
+    }
+    
+    .sensor-badge-value {
+        text-shadow: none !important;
+        border: 2px solid currentColor !important;
+    }
+}
+
+/* 센서별 색상 유지하면서 가독성 개선 */
+.bg-primary.sensor-badge-value { background-color: #0d6efd !important; }
+.bg-success.sensor-badge-value { background-color: #198754 !important; }
+.bg-danger.sensor-badge-value { background-color: #dc3545 !important; }
+.bg-warning.sensor-badge-value { 
+    background-color: #ffc107 !important; 
+    color: #000000 !important; 
+    text-shadow: none !important; 
+}
+.bg-info.sensor-badge-value { background-color: #0dcaf0 !important; }
+.bg-dark.sensor-badge-value { background-color: #212529 !important; }
+.bg-secondary.sensor-badge-value { background-color: #6c757d !important; }
+
+/* 다크 모드에서 경고 색상 조정 */
+[data-theme="dark"] .bg-warning.sensor-badge-value,
+[data-bs-theme="dark"] .bg-warning.sensor-badge-value,
+.dark-mode .bg-warning.sensor-badge-value,
+body.dark-mode .bg-warning.sensor-badge-value,
+html.dark-mode .bg-warning.sensor-badge-value {
+    background-color: #fab005 !important;
+    color: #000000 !important;
+    text-shadow: none !important;
+}
+
+/* 다크 모드에서 다른 배지 색상도 조정 */
+[data-theme="dark"] .bg-success.sensor-badge-value { background-color: #40c057 !important; }
+[data-theme="dark"] .bg-primary.sensor-badge-value { background-color: #339af0 !important; }
+[data-theme="dark"] .bg-danger.sensor-badge-value { background-color: #f03e3e !important; }
+[data-theme="dark"] .bg-info.sensor-badge-value { background-color: #339af0 !important; }
+
+@media (prefers-color-scheme: dark) {
+    .bg-warning.sensor-badge-value {
+        background-color: #fab005 !important;
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+    
+    .bg-success.sensor-badge-value { background-color: #40c057 !important; }
+    .bg-primary.sensor-badge-value { background-color: #339af0 !important; }
+    .bg-danger.sensor-badge-value { background-color: #f03e3e !important; }
+    .bg-info.sensor-badge-value { background-color: #339af0 !important; }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 전역 변수
+let socket = null;
+let isConnected = false;
+let isServerReady = false;  // C# 서버 준비 상태
+let dataCount = 0;
+let reconnectTimer = null;
+let lastDataTime = null;  // 마지막 데이터 수신 시간
+let activeSensors = new Set();  // 활성 센서 목록
+
+// 센서 설정을 서버에서 로드
+let SENSOR_CONFIGS = {};
+
+// DOM 요소
+const toggleBtn = document.getElementById('toggleConnection');
+const connectionStatus = document.getElementById('connectionStatus');
+const wsStatus = document.getElementById('wsStatus');
+const lastUpdate = document.getElementById('lastUpdate');
+const dataCountEl = document.getElementById('dataCount');
+const dataLog = document.getElementById('dataLog');
+const clearLogBtn = document.getElementById('clearLog');
+
+// 연결 토글 함수
+function toggleConnection() {
+    if (isConnected) {
+        disconnectWebSocket();
+    } else {
+        connectWebSocket();
+    }
+}
+
+// SSE 연결 함수
+function connectWebSocket() {
+    if (isConnected) {
+        return;
+    }
+
+    // Flask 서버에서 실제 TCP 서버 주소 정보 가져오기
+    fetch('/api/tcp-server-info')
+        .then(response => response.json())
+        .then(data => {
+            const serverUrl = `${data.host}:${data.port}`;
+            document.getElementById('serverAddress').textContent = serverUrl;
+            addToLog(`[시도] TCP 서버 ${serverUrl}에 SSE 연결 시도 중...`, 'info');
+        })
+        .catch(error => {
+            document.getElementById('serverAddress').textContent = 'Unknown';
+            addToLog(`[시도] SSE 연결 시도 중...`, 'info');
+        });
+    
+    isConnected = true;
+    updateConnectionUI(true);
+    
+    // SSE 연결 시작
+    startSSE();
+}
+
+// SSE 연결 시작
+function startSSE() {
+    addToLog('[연결] Server-Sent Events 연결을 시작합니다.', 'info');
+    
+    const eventSource = new EventSource('/api/sensor-stream');
+    socket = eventSource; // 기존 변수명 재사용
+    
+    eventSource.onopen = () => {
+        addToLog('[성공] SSE 연결이 성공했습니다.', 'success');
+    };
+    
+    eventSource.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            
+            // 특수 메시지 처리
+            if (data.type === 'connection') {
+                if (data.connected) {
+                    isServerReady = true;
+                    addToLog('[성공] TCP 서버에 연결되었습니다.', 'success');
+                    // TCP 서버가 재연결되었을 때 UI 상태 업데이트
+                    updateConnectionUI(true);
+                } else {
+                    isServerReady = false;
+                    addToLog('[경고] TCP 서버 연결이 끊어졌습니다.', 'warning');
+                    // TCP 서버 연결이 끊어졌을 때도 SSE는 유지됨을 표시
+                    wsStatus.textContent = 'TCP 서버 연결 끊김';
+                    wsStatus.className = 'text-warning';
+                }
+                return;
+            }
+            
+            if (data.type === 'heartbeat') {
+                // heartbeat는 로그에 출력하지 않음
+                return;
+            }
+            
+        } catch (e) {
+            // JSON이 아닌 경우 센서 데이터로 처리
+            const rawData = event.data;
+            
+            // 원본 데이터를 로그에 먼저 기록 (STX/ETX 제거 전)
+            addToLog(`[수신] ${rawData}`, 'info');
+            
+            // STX/ETX 제거 후 데이터 처리
+            const cleanedData = removeSTXETX(rawData);
+            processData(cleanedData);
+            
+            dataCount++;
+            dataCountEl.textContent = dataCount;
+            lastUpdate.textContent = new Date().toLocaleTimeString('ko-KR');
+            lastDataTime = Date.now();  // 마지막 데이터 수신 시간 업데이트
+        }
+    };
+    
+    eventSource.onerror = (error) => {
+        console.error('SSE 오류:', error);
+        addToLog('[오류] SSE 연결 오류가 발생했습니다.', 'danger');
+        
+        // 연결 상태 UI 업데이트
+        if (eventSource.readyState === EventSource.CLOSED) {
+            isServerReady = false;
+            wsStatus.textContent = 'SSE 연결 끊김';
+            wsStatus.className = 'text-danger';
+        }
+        
+        // 자동 재연결 (EventSource가 자동으로 재시도함)
+        if (toggleBtn.textContent.includes('중지')) {
+            setTimeout(() => {
+                if (eventSource.readyState === EventSource.CLOSED) {
+                    addToLog('[재연결] SSE 재연결 시도...', 'info');
+                    // 기존 이벤트 소스를 닫고 새로 시작
+                    if (socket && socket.close) {
+                        socket.close();
+                    }
+                    startSSE();
+                }
+            }, 3000);
+        }
+    };
+}
+
+// SSE 연결 해제 함수
+function disconnectWebSocket() {
+    if (socket && socket.close) {
+        socket.close();
+        socket = null;
+    }
+    
+    isConnected = false;
+    isServerReady = false;
+    updateConnectionUI(false);
+    
+    // 센서 카드들 초기화
+    activeSensors.clear();
+    document.getElementById('sensor-cards-row').innerHTML = `
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center text-muted">
+                    <i class="fas fa-satellite-dish fa-3x mb-3"></i>
+                    <h5>센서 데이터 대기 중...</h5>
+                    <p>연결 시작 버튼을 클릭하여 실시간 센서 데이터를 확인하세요.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    addToLog('[종료] SSE 연결이 종료되었습니다.', 'warning');
+}
+
+// 연결 상태 UI 업데이트
+function updateConnectionUI(connected) {
+    if (connected) {
+        toggleBtn.innerHTML = '<i class="fas fa-stop"></i> 연결 중지';
+        toggleBtn.className = 'btn btn-outline-danger';
+        toggleBtn.style.cssText = 'padding: 8px 16px; font-size: 1.1rem; min-width: 110px;';
+        connectionStatus.innerHTML = '<i class="fas fa-circle"></i> 연결됨';
+        connectionStatus.className = 'badge bg-success ms-2';
+        connectionStatus.style.cssText = 'min-width: 80px; text-align: center;';
+        wsStatus.textContent = '연결됨';
+        wsStatus.className = 'text-success';
+    } else {
+        toggleBtn.innerHTML = '<i class="fas fa-play"></i> 연결 시작';
+        toggleBtn.className = 'btn btn-outline-success';
+        toggleBtn.style.cssText = 'padding: 8px 16px; font-size: 1.1rem; min-width: 110px;';
+        connectionStatus.innerHTML = '<i class="fas fa-circle"></i> 연결 대기';
+        connectionStatus.className = 'badge bg-secondary ms-2';
+        connectionStatus.style.cssText = 'min-width: 80px; text-align: center;';
+        wsStatus.textContent = '미연결';
+        wsStatus.className = 'text-danger';
+    }
+}
+
+// 데이터 처리 함수
+function processData(rawData) {
+    try {
+        const parts = rawData.split('|');
+        
+        if (parts.length >= 3) {
+            const deviceId = parts[0];
+            const sensorType = parts[1];
+            const location = parts[2];
+            
+            // 센서 카드 생성/확인
+            ensureSensorCard(sensorType, deviceId, location);
+            
+            // 2025.08.25 duzin
+            // // 데이터 부분 파싱 (마지막 부분에서 IP 주소 제거)
+            // let dataString = parts.length > 3 ? parts[3] : '';
+            // if (dataString.includes('D^')) {
+            //     dataString = dataString.split('D^')[0];
+            // }            
+            // // 센서 데이터 업데이트
+            // updateSensorData(sensorType, deviceId, location, dataString);
+            updateSensorData(sensorType, deviceId, location, rawData);
+        }
+    } catch (error) {
+        console.error('데이터 처리 오류:', error);
+        addToLog('[오류] 데이터 처리 실패: ' + error.message, 'danger');
+    }
+}
+
+// 센서 카드 추가/업데이트 함수
+function ensureSensorCard(sensorType, deviceId, location) {
+    if (!activeSensors.has(sensorType)) {
+        activeSensors.add(sensorType);
+        
+        // 첫 번째 센서일 때 대기 메시지 제거
+        if (activeSensors.size === 1) {
+            document.getElementById('sensor-cards-row').innerHTML = '';
+        }
+        
+        // 새 센서 카드 생성
+        const cardHtml = createSensorCard(sensorType, deviceId, location);
+        if (cardHtml) {
+            document.getElementById('sensor-cards-row').insertAdjacentHTML('beforeend', cardHtml);
+        }
+    }
+}
+
+// 동적 센서 카드 생성 함수
+function createSensorCard(sensorType, deviceId, location) {
+    const config = SENSOR_CONFIGS[sensorType];
+    if (!config) return null;
+    
+    const cardId = `sensor-card-${sensorType}`;
+    
+    let fieldsHtml = '';
+    const visibleFields = config.fields.filter(field => field.visible !== false);
+    
+    visibleFields.forEach((field, index) => {
+        const fieldId = `${sensorType}-${field.index}`;
+        const isBadgeField = field.badge || field.status;
+        
+        fieldsHtml += `
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 border-0 sensor-data-card">
+                    <div class="card-body p-3 text-center">
+                        <div class="small mb-2 fw-bold sensor-field-name" style="font-size: 1.2em;">${field.name}</div>
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="mb-2" style="min-height: 80px; display: flex; align-items: center;">
+                                ${isBadgeField ? 
+                                    `<span id="${fieldId}" class="badge bg-secondary px-4 py-3 sensor-badge-value" style="font-size: 4rem !important; line-height: 1.2; min-width: 120px; min-height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold;">--</span>` :
+                                    `<span id="${fieldId}" class="fw-bold px-4 py-3 sensor-data-value" style="font-size: 4rem; line-height: 1.2; border-radius: 0.375rem; min-width: 120px; min-height: 60px; display: flex; align-items: center; justify-content: center;">--</span>`
+                                }
+                            </div>
+                            <div class="sensor-unit-label fw-semibold" style="font-size: 1.1rem;">${field.unit}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    return `
+        <div class="col-md-12 mb-4" id="${cardId}">
+            <div class="card shadow-sm border-0" style="border-radius: 12px;">
+                <div class="card-header bg-${config.color} text-white" style="border-radius: 12px 12px 0 0; border: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">
+                                <i class="${config.icon} me-2"></i> ${config.name}
+                            </h5>
+                            <small class="opacity-75" style="margin-left: 1rem;">${sensorType} SENSOR</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            ${(sensorType === 'TILT' || sensorType === 'CRACK') ? `
+                                <button class="btn btn-warning btn-sm" onclick="initializeSensor('${sensorType}')" title="센서 초기 값 설정">
+                                    <i class="fas fa-sync-alt"></i> 센서 초기 값 설정
+                                </button>
+                            ` : ''}
+                            <div class="text-end">
+                                <div class="small opacity-75">마지막 업데이트</div>
+                                <div class="fw-bold" id="${sensorType}-last-update">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- 장비 정보 섹션 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3" style="border-left: 4px solid var(--bs-${config.color});">
+                                <div class="me-4">
+                                    <i class="fas fa-microchip text-${config.color} fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold small">
+                                        장비번호 : <span id="${sensorType}-device-id">${deviceId}</span>
+                                        <span class="mx-2">|</span>
+                                        모드 : <span id="${sensorType}-location">${location}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 센서 데이터 섹션 -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="text-muted mb-3 border-bottom pb-2">
+                                <i class="fas fa-chart-line me-2"></i>센서 데이터
+                            </h6>
+                            <div class="row g-3">
+                                ${fieldsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 센서별 로그 색상 결정
+function getSensorLogColor(sensorType) {
+    const colorMap = {
+        'PM': 'primary',
+        'O2': 'success',
+        'MQ': 'warning', 
+        'NOX': 'danger',
+        'GASM': 'dark',
+        'WIND': 'info',
+        'VIBRO': 'secondary',
+        'CRACK': 'warning',
+        'TILT': 'info',
+        'SOUND': 'success'
+    };
+    return colorMap[sensorType] || 'info';
+}
+
+// STX/ETX 제거 함수
+function removeSTXETX(data) {
+    let cleaned = data;
+    
+    // STX (0x02) 제거 - 문자열 시작
+    if (cleaned.charCodeAt(0) === 0x02 || cleaned.startsWith('\u0002')) {
+        cleaned = cleaned.substring(1);
+    }
+    
+    // ETX (0x03) 제거 - 문자열 끝
+    if (cleaned.charCodeAt(cleaned.length - 1) === 0x03 || cleaned.endsWith('\u0003')) {
+        cleaned = cleaned.substring(0, cleaned.length - 1);
+    }
+    
+    // 추가적인 제어 문자들 제거 (필요시)
+    // SOH (0x01), EOT (0x04), ENQ (0x05), ACK (0x06) 등
+    cleaned = cleaned.replace(/[\x00-\x08\x0E-\x1F\x7F]/g, '');
+    
+    return cleaned.trim();
+}
+
+// 센서 데이터 업데이트 함수
+function updateSensorData(sensorType, deviceId, location, dataString) {
+    const config = SENSOR_CONFIGS[sensorType];
+    if (!config) return;
+    
+    // 기본 정보 업데이트
+    const deviceIdEl = document.getElementById(`${sensorType}-device-id`);
+    const locationEl = document.getElementById(`${sensorType}-location`);
+    const lastUpdateEl = document.getElementById(`${sensorType}-last-update`);
+    
+    if (deviceIdEl) deviceIdEl.textContent = deviceId;
+    if (locationEl) locationEl.textContent = location;
+    if (lastUpdateEl) lastUpdateEl.textContent = new Date().toLocaleTimeString('ko-KR');
+    
+    // 데이터 파싱 및 업데이트
+    let dataValues = '';
+    let statusmapping = '';;
+    let dataparse = '';
+    let dataparse2 = '';
+    let dataparse3 = '';
+    let dataparse4 = '';
+    let dataparse5 = '';
+    let dataparse6 = '';
+    let dataparse7 = '';
+    let dataparse8 = '';
+
+    const parts1 = dataString.split('^')[0];        // '^127.0.0.1' 부분 제거
+    const parts2 = parts1.split('|');               // '|'로 분리   
+
+    if (['SOUND', 'VIBRO', 'TILT', 'CRACK'].includes(sensorType)) {
+        // SOUND - 1|SOUND||54.1,78.0,55.4,55.4,G^192.168.0.27
+        // VIBRO - 1|VIBRO|HWT905|0.2,13.6,0.5,15.4,N^127.0.0.1
+        // TILT -  1|TILT|HWT905|0.3,13.6,0.5,15.4,N^127.0.0.1
+        // CRACK - 1|CRACK|MINUO|0.1,13.6,0.5,15.4,N^127.0.0.1
+
+        // 54.1, 78.0, 55.4, 55.4, G
+        dataparse = parts2.length > 3 ? parts2[3] : '';
+                
+        dataValues = dataparse.split(',');         // ','로 분리
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        // 예: index 0,1,2,3은 index 4
+        statusmapping = [4, 4, 4, 4, -1];
+    }
+    else if (sensorType == 'WIND') {
+        // WIND - 1|WIND|UltraSonic|4.1,10.2,5.3,5.2,G,200,SE^192.168.0.27
+
+        // 4.1, 10.2, 5.3, 5.2, G, 200, SE
+        dataparse = parts2.length > 3 ? parts2[3] : '';        
+        
+        dataValues = dataparse.split(',');         // ','로 분리
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        // 예: index 0,1,2,3은 index 4
+        statusmapping = [4, 4, 4, 4, -1, -1, -1];
+    }
+    else if (sensorType == 'NOX') {
+        // NOX - 1|NOX|NO2|0.040_600,0.000,0.000,0.035,N_D^192.168.0.27
+
+        // 0.040_600,0.000,0.000,0.035,N_D
+        dataparse = parts2.length > 3 ? parts2[3] : '';        
+        
+        dataValues = dataparse.split(/[_,]/);         // '_' or ','로 분리
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        // 예: index 0,1,2,3은 index 4
+        statusmapping = [5, 6, -1, -1, -1, -1, -1];
+    }
+    else if (sensorType == 'PM') {
+        // PM - 1|PM||35,35,18,20,N,0,75,75,37,35,G,0,,,^192.168.0.27
+
+        // 35,35,18,20,N,0,
+        // 75,75,37,35,G,0,
+        // x,x,x
+        dataparse = parts2.length > 3 ? parts2[3] : '';
+        
+        dataValues = dataparse.split(',');             // ','로 분리
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        statusmapping = [4, 4, 4, 4, -1, 4, 10, 10, 10, 10, -1, 10, -1, -1, -1];
+    }
+    else if (sensorType == 'O2') {
+        // O2 - 1|O2|PER|19.90_240_30_1200,20.10,19.80,19.86,W|19.90_240_30_1200^192.168.0.27
+
+        // 19.90_240_30_1200,20.10,19.80,19.86,W
+        dataparse = parts2.length > 3 ? parts2[3] : '';
+        // 19.90_240_30_1200
+        dataparse2 = parts2.length > 4 ? parts2[4] : '';
+        
+        dataValues = (dataparse + ',' + dataparse2).split(/[_,]/);         // '_' or ','로 분리        
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        statusmapping = [7, 7, 7, 7, 7, 7, 7, -1, 7, -1, -1, -1];
+    }
+    else if (sensorType == 'MQ') {
+        // MQ - 1|MQ|LPG|40_660_160,0,0,180,N_N_N|40_660_160^192.168.0.27
+
+        // 40_660_160,0,0,180,N_N_N
+        dataparse = parts2.length > 3 ? parts2[3] : '';
+        // 40_660_160
+        dataparse2 = parts2.length > 4 ? parts2[4] : '';
+        
+        dataValues = (dataparse + ',' + dataparse2).split(/[_,]/);         // '_' or ','로 분리        
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        statusmapping = [6, 7, 8, -1, -1, -1, -1, -1, -1, 6, 7, 8];
+    }
+    else if (sensorType == 'GASM') {
+        // GASM - 1|GASM|WMKY2000|5.999997,34,16,16,-1|11.99999,70,34,34,-1|18,70,30,30,-1|23.99999,70,34,34,-1|30,70,32,32,-1|36,70,35,35,-1|42.00002,70,33,33,1|47.99997,70,35,35,1^192.168.0.27
+
+        // 5.999997,34,16,16,-1
+        dataparse = parts2.length > 3 ? parts2[3] : '';
+        // 11.99999,70,34,34,-1
+        dataparse2 = parts2.length > 4 ? parts2[4] : '';
+        // 18,70,30,30,-1
+        dataparse3 = parts2.length > 5 ? parts2[5] : '';
+        // 23.99999,70,34,34,-1
+        dataparse4 = parts2.length > 6 ? parts2[6] : '';
+        // 30,70,32,32,-1
+        dataparse5 = parts2.length > 7 ? parts2[7] : '';
+        // 36,70,35,35,-1
+        dataparse6 = parts2.length > 8 ? parts2[8] : '';
+        // 42.00002,70,33,33,1
+        dataparse7 = parts2.length > 9 ? parts2[9] : '';
+        // 47.99997,70,35,35,1
+        dataparse8 = parts2.length > 10 ? parts2[10] : '';
+
+        dataValues = (dataparse + ',' + dataparse2 + ',' + dataparse3 + ',' + dataparse4 + ',' 
+                    + dataparse5 + ',' + dataparse6 + ',' + dataparse7 + ',' + dataparse8).split(/[_,]/);         // '_' or ','로 분리        
+
+        // 숫자로 변환 가능한 경우, 소수점 2자리로 포맷팅
+        dataValues = dataValues.map(value => {
+            if (!isNaN(value) && !isNaN(parseFloat(value))) {
+                return parseFloat(value).toFixed(2);
+            }
+            return value;
+        });
+
+        // 각 데이터 위치 별, 상태값으로 매핑할 인덱스들 (필요에 따라 수정 가능)
+        // -1은 상태값이 없음을 의미
+        statusmapping = [4, 4, 4, 4, -1, 
+                        9, 9, 9, 9, -1, 
+                        14, 14, 14, 14, -1, 
+                        19, 19, 19, 19, -1,                         
+                        24, 24, 24, 24, -1, 
+                        29, 29, 29, 29, -1, 
+                        34, 34, 34, 34, -1, 
+                        39, 39, 39, 39, -1];
+    }
+    
+
+    config.fields.forEach((field, index) => {
+        // visible이 false인 필드는 업데이트하지 않음
+        if (field.visible === false) return;
+        
+        const element = document.getElementById(`${sensorType}-${field.index}`);
+        if (element && dataValues[field.index] !== undefined) {
+            const value = dataValues[field.index].trim();
+            element.textContent = value || '--';
+            
+            // 상태 필드인 경우 배지 색상 업데이트
+            if (field.status) {
+                // updateStatusBadge(element, value);
+                const statusValue = field.index < statusmapping.length && statusmapping[field.index] >= 0 
+                    ? dataValues[statusmapping[field.index]]
+                    : 'X';
+
+                if (statusValue != 'X')
+                {
+                    updateStatusBadge(element, statusValue);
+                }
+            // // 배지 필드인 경우 값에 따른 색상 설정
+            // else if (field.badge) {
+            //     updateValueBadge(element, value, sensorType, field.name);
+            // }
+            }
+        }
+    });
+}
+
+// 값 배지 색상 업데이트
+function updateValueBadge(element, value, sensorType, fieldName) {
+    element.className = 'badge';
+    
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+        element.classList.add('bg-secondary');
+        return;
+    }
+    
+    // 센서별 임계값 설정
+    const thresholds = {
+        'PM': {'PM2.5': [15, 35, 75], 'PM10': [30, 80, 150]},
+        'O2': {'산소농도': [19, 21, 23]},
+        'MQ': {'MQ값': [50, 100, 200]},
+        'NOX': {'NO': [0.1, 0.2, 0.5], 'NO2': [0.1, 0.2, 0.5]},
+        'GASM': {'가스농도': [50, 100, 200]},
+        'WIND': {'풍속': [5, 10, 15]},
+        'VIBRO': {'진동': [0.5, 1.0, 2.0]},
+        'CRACK': {'균열폭': [0.1, 0.5, 1.0]},
+        'TILT': {'기울기': [1, 3, 5]},
+        'SOUND': {'소음': [40, 60, 80]}
+    };
+    
+    let colorClass = 'bg-success'; // 기본값: 양호
+    
+    // 임계값 확인
+    const sensorThresholds = thresholds[sensorType];
+    if (sensorThresholds) {
+        for (const [key, values] of Object.entries(sensorThresholds)) {
+            if (fieldName.includes(key) || fieldName.includes(key.substring(0, 2))) {
+                if (numValue >= values[2]) {
+                    colorClass = 'bg-danger';
+                } else if (numValue >= values[1]) {
+                    colorClass = 'bg-warning';
+                } else if (numValue >= values[0]) {
+                    colorClass = 'bg-primary';
+                }
+                break;
+            }
+        }
+    }
+    
+    element.classList.add(colorClass);
+}
+
+// 상태 배지 업데이트
+function updateStatusBadge(element, status) {
+    element.className = 'badge';
+    
+    if (status.includes('G') || status.includes('좋음') || status.includes('Good') || status == '1.00') {
+        element.classList.add('bg-success');
+    } else if (status.includes('N') || status.includes('보통') || status.includes('Normal')) {
+        element.classList.add('bg-primary');
+    } else if (status.includes('W') || status.includes('나쁨') || status.includes('Bad')) {
+        element.classList.add('bg-warning');
+    } else if (status.includes('D') || status.includes('매우나쁨') || status.includes('Very Bad') || status == '-1.00') {
+        element.classList.add('bg-danger');
+    } else if (status.includes('X')) {
+        element.classList.add('bg-dark');  // 검은색 배지로 'X' 상태 표시
+    } else {
+        element.classList.add('bg-secondary');
+    }
+}
+
+// 센서 초기 값 설정 함수
+function initializeSensor(sensorType) {
+    // 인증 모달 표시
+    document.getElementById('initSensorType').value = sensorType;
+    document.getElementById('authModalLabel').textContent = `${sensorType} 센서 초기 값 설정`;
+    document.getElementById('authUsername').value = '';
+    document.getElementById('authPassword').value = '';
+    document.getElementById('authError').style.display = 'none';
+    
+    const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+    authModal.show();
+}
+
+// 센서 초기화 확인 함수
+function confirmSensorInit() {
+    const sensorType = document.getElementById('initSensorType').value;
+    const username = document.getElementById('authUsername').value;
+    const password = document.getElementById('authPassword').value;
+    const authError = document.getElementById('authError');
+    
+    if (!username || !password) {
+        authError.textContent = '사용자명과 비밀번호를 입력해주세요.';
+        authError.style.display = 'block';
+        return;
+    }
+    
+    // 서버에 초기화 요청
+    fetch('/api/sensor-init', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            sensorType: sensorType,
+            username: username,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            addToLog(`${sensorType} 센서 초기 값 설정 완료`, 'success');
+            
+            // 성공 메시지 먼저 표시
+            const successMessage = data.message || `${sensorType} 센서 초기 값이 설정되었습니다.`;
+            alert(successMessage);
+            
+            // 모달 닫기
+            const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+            authModal.hide();
+            
+            // 재시작 확인 팝업 (alert 후 바로 실행)
+            askForSensorRestart();
+        } else {
+            authError.textContent = data.error || '초기화 실패';
+            authError.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        authError.textContent = `오류: ${error}`;
+        authError.style.display = 'block';
+    });
+}
+
+// 센서 프로그램 재시작 확인 함수
+function askForSensorRestart() {
+    // 재시작 확인 팝업
+    if (confirm('통합센서 프로그램을 재시작 하시겠습니까?')) {
+        addToLog('통합센서 프로그램 재시작 중...', 'info');
+        
+        // 재시작 API 호출
+        fetch('/api/restart-sensor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addToLog('통합센서 프로그램 재시작 완료', 'success');
+                alert('통합센서 프로그램이 재시작되었습니다.');
+            } else {
+                addToLog('통합센서 프로그램 재시작 실패', 'danger');
+                alert('통합센서 프로그램 재시작에 실패했습니다: ' + (data.error || '알 수 없는 오류'));
+            }
+        })
+        .catch(error => {
+            console.error('재시작 오류:', error);
+            addToLog('통합센서 프로그램 재시작 오류', 'danger');
+            alert('통합센서 프로그램 재시작 중 오류가 발생했습니다.');
+        });
+    } else {
+        addToLog('통합센서 프로그램 재시작 취소', 'info');
+    }
+}
+
+// 로그 추가 함수
+function addToLog(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString('ko-KR');
+    const colorClass = {
+        'success': 'text-success',
+        'danger': 'text-danger',
+        'warning': 'text-warning',
+        'info': 'text-info',
+        'primary': 'text-primary'
+    }[type] || 'text-light';
+    
+    const logEntry = `<span class="${colorClass}">[${timestamp}] ${message}</span>\n`;
+    dataLog.innerHTML += logEntry;
+    
+    // 자동 스크롤 (로그 컨테이너 하단으로)
+    const logContainer = document.getElementById('dataLogContainer');
+    logContainer.scrollTop = logContainer.scrollHeight;
+    
+    // 로그 크기 제한 (최대 100개 항목)
+    const lines = dataLog.innerHTML.split('\n');
+    if (lines.length > 100) {
+        dataLog.innerHTML = lines.slice(-100).join('\n');
+    }
+}
+
+// 데이터 로그 토글 함수
+function toggleDataLog() {
+    const logCollapse = document.getElementById('dataLogCollapse');
+    const logToggleIcon = document.getElementById('logToggleIcon');
+    const isCollapsed = !logCollapse.classList.contains('show');
+    
+    if (isCollapsed) {
+        // 펼치기
+        logCollapse.classList.add('show');
+        logToggleIcon.style.transform = 'rotate(180deg)';
+        
+        // 화면 하단으로 스크롤
+        setTimeout(() => {
+            logCollapse.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 300);
+    } else {
+        // 접기
+        logCollapse.classList.remove('show');
+        logToggleIcon.style.transform = 'rotate(0deg)';
+    }
+}
+
+// 로그 지우기 함수 (표시된 로그만 삭제)
+function clearLogOnly() {
+    dataLog.innerHTML = '';
+    addToLog('[시스템] 로그가 지워졌습니다.', 'info');
+}
+
+// 이벤트 리스너
+toggleBtn.addEventListener('click', toggleConnection);
+
+// 연결 상태 모니터링 함수
+function monitorConnection() {
+    if (isConnected && lastDataTime) {
+        const timeSinceLastData = Date.now() - lastDataTime;
+        // 5분 이상 데이터가 없으면 경고
+        if (timeSinceLastData > 300000) { // 5분 = 300,000ms
+            addToLog('[경고] 5분 이상 데이터가 수신되지 않았습니다.', 'warning');
+            lastDataTime = null; // 중복 경고 방지
+        }
+    }
+}
+
+// 센서 설정 로드 함수
+async function loadSensorConfig() {
+    try {
+        const response = await fetch('/api/sensor-config');
+        if (response.ok) {
+            SENSOR_CONFIGS = await response.json();
+            addToLog('[시스템] 센서 설정이 로드되었습니다.', 'info');
+        } else {
+            addToLog('[오류] 센서 설정 로드 실패', 'danger');
+        }
+    } catch (error) {
+        console.error('센서 설정 로드 오류:', error);
+        addToLog('[오류] 센서 설정 로드 중 오류 발생', 'danger');
+    }
+}
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', async () => {
+    // 센서 설정 먼저 로드
+    await loadSensorConfig();
+    
+    addToLog('[시스템] 센서 대시보드 준비 완료', 'info');
+    
+    // 30초마다 연결 상태 모니터링
+    setInterval(monitorConnection, 30000);
+    
+    // 데이터 로그는 기본적으로 접힌 상태로 시작
+    const logCollapse = document.getElementById('dataLogCollapse');
+    const logToggleIcon = document.getElementById('logToggleIcon');
+    logCollapse.classList.remove('show');
+    logToggleIcon.style.transform = 'rotate(0deg)';
+});
+
+// 페이지 언로드 시 정리
+window.addEventListener('beforeunload', () => {
+    if (socket && socket.close) {
+        socket.close();
+    }
+});
+</script>
+
+<!-- 인증 모달 -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authModalLabel">센서 초기 값 설정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="initSensorType">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    센서 초기 값 설정은 중요한 작업입니다.<br>
+                    인증을 위해 로그인 정보를 다시 입력해주세요.
+                </div>
+                <div class="alert alert-danger" id="authError" style="display: none;" role="alert"></div>
+                <div class="mb-3">
+                    <label for="authUsername" class="form-label">사용자명</label>
+                    <input type="text" class="form-control" id="authUsername" placeholder="사용자명을 입력하세요">
+                </div>
+                <div class="mb-3">
+                    <label for="authPassword" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="authPassword" placeholder="비밀번호를 입력하세요">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-warning" onclick="confirmSensorInit()">
+                    <i class="fas fa-sync-alt"></i> 초기 값 설정
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

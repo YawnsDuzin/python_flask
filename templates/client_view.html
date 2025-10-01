@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}CLIENT 상세정보 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> CLIENT 상세정보</h2>
+    <div class="btn-group" role="group">
+        {% if session.permission in ['admin', 'operator'] %}
+        <a href="{{ url_for('client.edit_client', idx=client_item.idx) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        {% endif %}
+        <a href="{{ url_for('client.client_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card device-card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> CLIENT 정보</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="20%">CLIENT ID:</th>
+                        <td>{{ client_item.idx or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>센서 명:</th>
+                        <td><strong>{{ client_item.name or '-' }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>센서 타입:</th>
+                        <td>{{ client_item.type or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>CLIENT 사용유무:</th>
+                        <td>
+                            {% if client_item.use == 'Y' %}
+                                <span class="badge bg-danger">{{ client_item.use }} (사용)</span>
+                            {% elif client_item.use == 'N' %}
+                                <span class="badge bg-secondary">{{ client_item.use }} (미사용)</span>
+                            {% else %}
+                                {{ client_item.use or '-' }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>IP(SERVER):</th>
+                        <td>{{ client_item.ip or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>PORT(SERVER):</th>
+                        <td>{{ client_item.port or '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>모니터 번호:</th>
+                        <td>{{ client_item.monitor or '-' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

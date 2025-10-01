@@ -1,0 +1,195 @@
+{
+    "SOUND": {
+        "name": "소음센서",
+        "icon": "fas fa-sound",
+        "color": "success",
+        "fields": [
+            {"name": "소음", "unit": "dB", "index": 0, "visible": true, "status": true},
+            {"name": "일최대", "unit": "dB", "index": 1, "visible": true},
+            {"name": "일평균", "unit": "dB", "index": 2, "visible": true},
+            {"name": "월평균", "unit": "dB", "index": 3, "visible": true},
+            {"name": "상태", "unit": "", "index": 4, "visible": true}
+        ]
+    },
+    "VIBRO": {
+        "name": "진동센서",
+        "icon": "fas fa-wave-square",
+        "color": "secondary",
+        "fields": [
+            {"name": "진동", "unit": "dbv", "index": 0, "visible": true, "status": true},
+            {"name": "일최대", "unit": "dbv", "index": 1, "visible": true},
+            {"name": "일평균", "unit": "dbv", "index": 2, "visible": true},
+            {"name": "월평균", "unit": "dbv", "index": 3, "visible": true},
+            {"name": "상태", "unit": "", "index": 4, "visible": true}
+        ]
+    },
+    "TILT": {
+        "name": "기울기센서",
+        "icon": "fas fa-angle-double-right",
+        "color": "dark",
+        "fields": [
+            {"name": "기울기(100%)", "unit": "%", "index": 0, "visible": true, "status": true},
+            {"name": "일최대", "unit": "%", "index": 1, "visible": true},
+            {"name": "일평균", "unit": "%", "index": 2, "visible": true},
+            {"name": "월평균", "unit": "%", "index": 3, "visible": true},
+            {"name": "상태", "unit": "", "index": 4, "visible": true}
+        ]
+    },
+    "CRACK": {
+        "name": "균열센서",
+        "icon": "fas fa-crack",
+        "color": "warning",
+        "fields": [
+            {"name": "균열폭", "unit": "mm", "index": 0, "visible": true, "status": true},
+            {"name": "일최대", "unit": "mm", "index": 1, "visible": true},
+            {"name": "일평균", "unit": "mm", "index": 2, "visible": true},
+            {"name": "월평균", "unit": "mm", "index": 3, "visible": true},
+            {"name": "상태", "unit": "", "index": 4, "visible": true}
+        ]
+    },
+    "WIND": {
+        "name": "풍속계",
+        "icon": "fas fa-wind",
+        "color": "info",
+        "fields": [
+            {"name": "풍속", "unit": "m/s", "index": 0, "visible": true, "status": true},
+            {"name": "일최대", "unit": "m/s", "index": 1, "visible": true},
+            {"name": "일평균", "unit": "m/s", "index": 2, "visible": true},
+            {"name": "월평균", "unit": "m/s", "index": 3, "visible": true},
+            {"name": "상태", "unit": "", "index": 4, "visible": true},
+
+            {"name": "풍향_각도", "unit": "", "index": 5, "visible": true},
+            {"name": "풍향_방향", "unit": "", "index": 6, "visible": true}
+        ]
+    },
+    "NOX": {
+        "name": "NOX센서",
+        "icon": "fas fa-industry",
+        "color": "danger",
+        "fields": [
+            {"name": "NO2_농도", "unit": "%", "index": 0, "visible": true, "status": true},
+            {"name": "CO_농도", "unit": "%", "index": 1, "visible": true, "status": true},
+            {"name": "일최대", "unit": "%", "index": 2, "visible": true},
+            {"name": "일평균", "unit": "%", "index": 3, "visible": true},
+            {"name": "월평균", "unit": "%", "index": 4, "visible": true},
+            {"name": "NO2_상태", "unit": "", "index": 5, "visible": true},
+            {"name": "CO_상태", "unit": "", "index": 6, "visible": true}
+        ]
+    },
+    "PM": {
+        "name": "미세먼지",
+        "icon": "fas fa-smog",
+        "color": "primary",
+        "fields": [
+            {"name": "PM2.5 현재", "unit": "m/g", "index": 0, "visible": true, "status": true},
+            {"name": "PM2.5 일최대", "unit": "m/g", "index": 1, "visible": true},
+            {"name": "PM2.5 일평균", "unit": "m/g", "index": 2, "visible": true},
+            {"name": "PM2.5 월평균", "unit": "m/g", "index": 3, "visible": true},
+            {"name": "PM2.5 상태", "unit": "", "index": 4, "visible": true},
+            {"name": "PM2.5 예보", "unit": "m/g", "index": 5, "visible": true},
+
+            {"name": "PM10 현재", "unit": "m/g", "index": 6, "visible": true, "status": true},
+            {"name": "PM10 일최대", "unit": "m/g", "index": 7, "visible": true},
+            {"name": "PM10 일평균", "unit": "m/g", "index": 8, "visible": true},
+            {"name": "PM10 월평균", "unit": "m/g", "index": 9, "visible": true},
+            {"name": "PM10 상태", "unit": "", "index": 10, "visible": true},
+            {"name": "PM10 예보", "unit": "m/g", "index": 11, "visible": true},
+
+            {"name": "시도 이름", "unit": "", "index": 12, "visible": true},
+            {"name": "구 이름", "unit": "", "index": 13, "visible": true},
+            {"name": "이전시간", "unit": "", "index": 14, "visible": true}
+        ]
+    },
+    "O2": {
+        "name": "산소센서",
+        "icon": "fas fa-wind",
+        "color": "success",
+        "fields": [
+            {"name": "PER", "unit": "%", "index": 0, "visible": true, "status": true},
+            {"name": "PPM", "unit": "%", "index": 1, "visible": true},
+            {"name": "TEMP", "unit": "%", "index": 2, "visible": true},
+            {"name": "AT", "unit": "%", "index": 3, "visible": true},
+            {"name": "일최대", "unit": "%", "index": 4, "visible": true},
+            {"name": "일평균", "unit": "%", "index": 5, "visible": true},
+            {"name": "월평균", "unit": "%", "index": 6, "visible": true},
+            {"name": "상태", "unit": "", "index": 7, "visible": true},
+            {"name": "PER2", "unit": "%", "index": 8, "visible": true, "status": true},
+            {"name": "PPM2", "unit": "%", "index": 9, "visible": true},
+            {"name": "TEMP2", "unit": "%", "index": 10, "visible": true},
+            {"name": "AT2", "unit": "%", "index": 11, "visible": true}
+        ]
+    },
+    "MQ": {
+        "name": "MQ센서",
+        "icon": "fas fa-exclamation-triangle",
+        "color": "warning",
+        "fields": [
+            {"name": "LPG_농도", "unit": "ppm", "index": 0, "visible": true, "status": true},
+            {"name": "CO_농도", "unit": "ppm", "index": 1, "visible": true, "status": true},
+            {"name": "SMOKE_농도", "unit": "ppm", "index": 2, "visible": true, "status": true},
+            {"name": "일최대", "unit": "ppm", "index": 3, "visible": true},
+            {"name": "일평균", "unit": "ppm", "index": 4, "visible": true},
+            {"name": "월평균", "unit": "ppm", "index": 5, "visible": true},
+            {"name": "LPG_상태", "unit": "", "index": 6, "visible": true},
+            {"name": "CO_상태", "unit": "", "index": 7, "visible": true},
+            {"name": "SMOKE_상태", "unit": "", "index": 8, "visible": true},
+            {"name": "LPG_농도2", "unit": "ppm", "index": 9, "visible": true, "status": true},
+            {"name": "CO_농도2", "unit": "ppm", "index": 10, "visible": true, "status": true},
+            {"name": "SMOKE_농도2", "unit": "ppm", "index": 11, "visible": true, "status": true}
+        ]
+    },    
+    "GASM": {
+        "name": "가스센서",
+        "icon": "fas fa-gas-pump",
+        "color": "dark",
+        "fields": [
+            {"name": "GAS1 현재", "unit": "ppm", "index": 0, "visible": true, "status": true},
+            {"name": "GAS1 일최대", "unit": "ppm", "index": 1, "visible": true},
+            {"name": "GAS1 일평균", "unit": "ppm", "index": 2, "visible": true},
+            {"name": "GAS1 월평균", "unit": "ppm", "index": 3, "visible": true},
+            {"name": "GAS1 상태", "unit": "", "index": 4, "visible": true},
+
+            {"name": "GAS2 현재", "unit": "ppm", "index": 5, "visible": true, "status": true},
+            {"name": "GAS2 일최대", "unit": "ppm", "index": 6, "visible": true},
+            {"name": "GAS2 일평균", "unit": "ppm", "index": 7, "visible": true},
+            {"name": "GAS2 월평균", "unit": "ppm", "index": 8, "visible": true},
+            {"name": "GAS2 상태", "unit": "", "index": 9, "visible": true},
+
+            {"name": "GAS3 현재", "unit": "ppm", "index": 10, "visible": true, "status": true},
+            {"name": "GAS3 일최대", "unit": "ppm", "index": 11, "visible": true},
+            {"name": "GAS3 일평균", "unit": "ppm", "index": 12, "visible": true},
+            {"name": "GAS3 월평균", "unit": "ppm", "index": 13, "visible": true},
+            {"name": "GAS3 상태", "unit": "", "index": 14, "visible": true},
+
+            {"name": "GAS4 현재", "unit": "ppm", "index": 15, "visible": true, "status": true},
+            {"name": "GAS4 일최대", "unit": "ppm", "index": 16, "visible": true},
+            {"name": "GAS4 일평균", "unit": "ppm", "index": 17, "visible": true},
+            {"name": "GAS4 월평균", "unit": "ppm", "index": 18, "visible": true},
+            {"name": "GAS4 상태", "unit": "", "index": 19, "visible": true},
+
+            {"name": "GAS5 현재", "unit": "ppm", "index": 20, "visible": true, "status": true},
+            {"name": "GAS5 일최대", "unit": "ppm", "index": 21, "visible": true},
+            {"name": "GAS5 일평균", "unit": "ppm", "index": 22, "visible": true},
+            {"name": "GAS5 월평균", "unit": "ppm", "index": 23, "visible": true},
+            {"name": "GAS5 상태", "unit": "", "index": 24, "visible": true},
+
+            {"name": "GAS6 현재", "unit": "ppm", "index": 25, "visible": true, "status": true},
+            {"name": "GAS6 일최대", "unit": "ppm", "index": 26, "visible": true},
+            {"name": "GAS6 일평균", "unit": "ppm", "index": 27, "visible": true},
+            {"name": "GAS6 월평균", "unit": "ppm", "index": 28, "visible": true},
+            {"name": "GAS6 상태", "unit": "", "index": 29, "visible": true},
+
+            {"name": "GAS7 현재", "unit": "ppm", "index": 30, "visible": true, "status": true},
+            {"name": "GAS7 일최대", "unit": "ppm", "index": 31, "visible": true},
+            {"name": "GAS7 일평균", "unit": "ppm", "index": 32, "visible": true},
+            {"name": "GAS7 월평균", "unit": "ppm", "index": 33, "visible": true},
+            {"name": "GAS7 상태", "unit": "", "index": 34, "visible": true},
+
+            {"name": "GAS8 현재", "unit": "ppm", "index": 35, "visible": true, "status": true},
+            {"name": "GAS8 일최대", "unit": "ppm", "index": 36, "visible": true},
+            {"name": "GAS8 일평균", "unit": "ppm", "index": 37, "visible": true},
+            {"name": "GAS8 월평균", "unit": "ppm", "index": 38, "visible": true},
+            {"name": "GAS8 상태", "unit": "", "index": 39, "visible": true}
+        ]
+    }
+}

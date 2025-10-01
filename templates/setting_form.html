@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('device.setting_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                <div class="mb-3">
+                    <label for="code" class="form-label">현장구분 코드 *</label>
+                    <input type="text" class="form-control" id="code" name="code" 
+                           value="{{ setting.code if setting else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="dv_no" class="form-label">센서 순번</label>
+                    <input type="text" class="form-control" id="dv_no" name="dv_no" 
+                           value="{{ setting.dv_no if setting else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="mode" class="form-label">SET 통신모드</label>
+                    <select class="form-control" id="mode" name="mode">
+                        <option value="">선택하세요</option>
+                        <option value="SERVER" {% if setting and setting.mode == 'SERVER' %}selected{% endif %}>SERVER</option>
+                        <option value="CLIENT" {% if setting and setting.mode == 'CLIENT' %}selected{% endif %}>CLIENT</option>
+                        <option value="StandAlone" {% if setting and setting.mode == 'StandAlone' %}selected{% endif %}>StandAlone</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="send_data" class="form-label">데이터 전송</label>
+                    <select class="form-control" id="send_data" name="send_data">
+                        <option value="">선택하세요</option>
+                        <option value="PMS2" {% if setting and setting.send_data == 'PMS2' %}selected{% endif %}>PMS2</option>
+                        <option value="N" {% if setting and setting.send_data == 'N' %}selected{% endif %}>N</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="monitor_use" class="form-label">모니터 사용</label>
+                    <select class="form-control" id="monitor_use" name="monitor_use">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if setting and setting.monitor_use == 'Y' %}selected{% endif %}>Y</option>
+                        <option value="N" {% if setting and setting.monitor_use == 'N' %}selected{% endif %}>N</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="debug" class="form-label">디버그 모드</label>
+                    <select class="form-control" id="debug" name="debug">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if setting and setting.debug == 'Y' %}selected{% endif %}>Y</option>
+                        <option value="N" {% if setting and setting.debug == 'N' %}selected{% endif %}>N</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-cogs"></i> 시스템 설정</h5>
+                <div class="mb-3">
+                    <label for="log" class="form-label">로그 저장</label>
+                    <select class="form-control" id="log" name="log">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if setting and setting.log == 'Y' %}selected{% endif %}>Y</option>
+                        <option value="N" {% if setting and setting.log == 'N' %}selected{% endif %}>N</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="log_del" class="form-label">로그삭제(일자)</label>
+                    <input type="text" class="form-control" id="log_del" name="log_del" 
+                           value="{{ setting.log_del if setting else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="reboot_time" class="form-label">재부팅 시간</label>
+                    <input type="text" class="form-control" id="reboot_time" name="reboot_time" 
+                           value="{{ setting.reboot_time if setting else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="sound" class="form-label">사운드</label>
+                    <input type="text" class="form-control" id="sound" name="sound" 
+                           value="{{ setting.sound if setting else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="siren_cnt" class="form-label">사이렌 횟수</label>
+                    <input type="text" class="form-control" id="siren_cnt" name="siren_cnt" 
+                           value="{{ setting.siren_cnt if setting else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('device.setting_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}

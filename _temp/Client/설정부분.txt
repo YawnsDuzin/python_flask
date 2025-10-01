@@ -1,0 +1,13 @@
+FLASK
+ sensor.db
+  config : flask host
+  config : flask port
+
+API KEY
+ sensor.db
+  config : api sensor_stream_key_client
+
+
+
+센서 대시보드
+templates/sensor_dashboard/sensor_dashboard.html

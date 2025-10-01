@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+<style>
+/* 투명 색상 미리보기를 위한 스타일 */
+.color-preview-transparent {
+    width: 50px;
+    height: 38px;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background-image:
+        linear-gradient(45deg, #808080 25%, transparent 25%),
+        linear-gradient(-45deg, #808080 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #808080 75%),
+        linear-gradient(-45deg, transparent 75%, #808080 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+    cursor: not-allowed;
+}
+
+/* 다크모드에서 투명 색상 미리보기 */
+[data-theme="dark"] .color-preview-transparent {
+    background-image:
+        linear-gradient(45deg, #606060 25%, transparent 25%),
+        linear-gradient(-45deg, #606060 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #606060 75%),
+        linear-gradient(-45deg, transparent 75%, #606060 75%);
+}
+
+/* 컬러피커 숨김 클래스 */
+.color-picker-hidden {
+    display: none !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="fas fa-desktop"></i> {{ title }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>기본 정보</h5>
+                            
+                            <div class="mb-3">
+                                <label for="fcode" class="form-label">코드 (fcode) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fcode" name="fcode" 
+                                       value="{{ font_item['fcode'] if font_item else '' }}" 
+                                       {% if action == 'edit' %}readonly{% endif %} required>
+                                {% if action == 'add' %}
+                                <small class="form-text text-muted">고유한 코드를 입력하세요 (예: F001, LED01)</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="fname" class="form-label">이름 (fname) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fname" name="fname" 
+                                       value="{{ font_item['fname'] if font_item else '' }}" 
+                                       {% if action == 'edit' %}readonly{% endif %} required>
+                                <small class="form-text text-muted">설정 이름을 입력하세요</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="ftext" class="form-label">텍스트 (ftext)</label>
+                                <textarea class="form-control" id="ftext" name="ftext" rows="3">{{ font_item['ftext'] if font_item and font_item['ftext'] else '' }}</textarea>
+                                <small class="form-text text-muted">표시할 텍스트 내용</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-section">
+                            <h5>폰트 설정</h5>
+
+                            <div class="mb-3">
+                                <label for="fsize" class="form-label">크기 (fsize)</label>
+                                <input type="text" class="form-control" id="fsize" name="fsize"
+                                       value="{{ font_item['fsize'] if font_item and font_item['fsize'] else '' }}"
+                                       placeholder="예: 12, 16, 24">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ffont" class="form-label">폰트 (ffont)</label>
+                                <input type="text" class="form-control" id="ffont" name="ffont"
+                                       value="{{ font_item['ffont'] if font_item and font_item['ffont'] else '' }}"
+                                       placeholder="예: Arial, 맑은고딕">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fstyle" class="form-label">스타일 (fstyle)</label>
+                                <input type="text" class="form-control" id="fstyle" name="fstyle"
+                                       value="{{ font_item['fstyle'] if font_item and font_item['fstyle'] else '' }}"
+                                       placeholder="예: bold, italic, normal">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h5>색상 설정</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fcolor" class="form-label">폰트 색상 (fcolor)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fcolor" name="fcolor"
+                                           value="{{ font_item['fcolor'] if font_item and font_item['fcolor'] else '' }}"
+                                           placeholder="예: 255, 204, 0 또는 White">
+                                    <input type="color" class="form-control form-control-color"
+                                           id="fcolor_picker" style="max-width: 50px;"
+                                           value="#000000">
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">빠른 선택: </small>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'White')">White</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Black')">Black</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Red')">Red</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Blue')">Blue</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Green')">Green</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Yellow')">Yellow</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fcolor', 'Transparent')">Transparent</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fbg" class="form-label">배경 색상 (fbg)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fbg" name="fbg"
+                                           value="{{ font_item['fbg'] if font_item and font_item['fbg'] else '' }}"
+                                           placeholder="예: 255, 255, 255 또는 White">
+                                    <input type="color" class="form-control form-control-color"
+                                           id="fbg_picker" style="max-width: 50px;"
+                                           value="#FFFFFF">
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">빠른 선택: </small>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'White')">White</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Black')">Black</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Red')">Red</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Blue')">Blue</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Green')">Green</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Yellow')">Yellow</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="setColor('fbg', 'Transparent')">Transparent</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-end">
+                    <a href="{{ url_for('client.font_settings_list', fcode=search_fcode, fname=search_fname) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> 취소
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// 색상 이름과 대응하는 RGB/HEX 값 매핑
+const colorMap = {
+    'White': { rgb: '255, 255, 255', hex: '#FFFFFF' },
+    'Black': { rgb: '0, 0, 0', hex: '#000000' },
+    'Red': { rgb: '255, 0, 0', hex: '#FF0000' },
+    'Blue': { rgb: '0, 0, 255', hex: '#0000FF' },
+    'Green': { rgb: '0, 128, 0', hex: '#008000' },
+    'Yellow': { rgb: '255, 255, 0', hex: '#FFFF00' },
+    'Transparent': { rgb: 'Transparent', hex: '#000000' }  // Transparent는 특별 처리
+};
+
+// 빠른 색상 선택 함수
+function setColor(fieldId, colorName) {
+    const input = document.getElementById(fieldId);
+    const picker = document.getElementById(fieldId + '_picker');
+    const pickerWrapper = picker.parentElement;
+
+    if (colorMap[colorName]) {
+        // Transparent는 특별 처리
+        if (colorName === 'Transparent') {
+            input.value = 'Transparent';
+
+            // 기존 컬러피커 숨기기
+            picker.classList.add('color-picker-hidden');
+
+            // 투명 패턴 미리보기가 없으면 추가
+            let transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+            if (!transparentPreview) {
+                transparentPreview = document.createElement('div');
+                transparentPreview.className = 'color-preview-transparent';
+                transparentPreview.title = 'Transparent';
+                pickerWrapper.appendChild(transparentPreview);
+            }
+        } else {
+            // RGB 값으로 입력 필드 설정
+            input.value = colorMap[colorName].rgb;
+            // HEX 값으로 컬러피커 설정
+            picker.value = colorMap[colorName].hex;
+
+            // 컬러피커 보이기
+            picker.classList.remove('color-picker-hidden');
+
+            // 투명 패턴 미리보기 제거
+            const transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+            if (transparentPreview) {
+                transparentPreview.remove();
+            }
+        }
+    } else {
+        // 직접 입력된 색상명 처리
+        input.value = colorName;
+
+        // 컬러피커 보이기
+        picker.classList.remove('color-picker-hidden');
+
+        // 투명 패턴 미리보기 제거
+        const transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+        if (transparentPreview) {
+            transparentPreview.remove();
+        }
+    }
+}
+
+// HEX 색상을 RGB 형식으로 변환하는 함수
+function hexToRgb(hex) {
+    // #을 제거
+    hex = hex.replace('#', '');
+
+    // HEX를 RGB로 변환
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    // "R, G, B" 형식으로 반환
+    return `${r}, ${g}, ${b}`;
+}
+
+// RGB 문자열을 HEX로 변환하는 함수
+function rgbToHex(rgbStr) {
+    // "R, G, B" 형식의 문자열을 파싱
+    const parts = rgbStr.split(',').map(s => s.trim());
+    if (parts.length !== 3) return '#000000';
+
+    const r = parseInt(parts[0]) || 0;
+    const g = parseInt(parts[1]) || 0;
+    const b = parseInt(parts[2]) || 0;
+
+    // HEX로 변환
+    const hex = '#' +
+        ((1 << 24) + (r << 16) + (g << 8) + b)
+        .toString(16)
+        .slice(1)
+        .toUpperCase();
+
+    return hex;
+}
+
+// 색상 선택기와 텍스트 입력 필드 연동 - fcolor
+document.getElementById('fcolor_picker').addEventListener('change', function() {
+    // HEX를 RGB 형식으로 변환하여 입력 필드에 설정
+    document.getElementById('fcolor').value = hexToRgb(this.value);
+});
+
+document.getElementById('fcolor').addEventListener('change', function() {
+    const value = this.value.trim();
+    const picker = document.getElementById('fcolor_picker');
+    const pickerWrapper = picker.parentElement;
+
+    // Transparent 처리
+    if (value.toLowerCase() === 'transparent') {
+        // 컬러피커 숨기기
+        picker.classList.add('color-picker-hidden');
+
+        // 투명 패턴 미리보기 추가
+        let transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+        if (!transparentPreview) {
+            transparentPreview = document.createElement('div');
+            transparentPreview.className = 'color-preview-transparent';
+            transparentPreview.title = 'Transparent';
+            pickerWrapper.appendChild(transparentPreview);
+        }
+    } else {
+        // 컬러피커 보이기
+        picker.classList.remove('color-picker-hidden');
+
+        // 투명 패턴 미리보기 제거
+        const transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+        if (transparentPreview) {
+            transparentPreview.remove();
+        }
+
+        // HEX 형식인 경우
+        if (value.match(/^#[0-9A-F]{6}$/i)) {
+            picker.value = value;
+            // HEX를 RGB로 변환하여 다시 설정
+            this.value = hexToRgb(value);
+        }
+        // RGB 형식인 경우 (예: "255, 204, 0")
+        else if (value.match(/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/)) {
+            picker.value = rgbToHex(value);
+        }
+    }
+});
+
+// 색상 선택기와 텍스트 입력 필드 연동 - fbg
+document.getElementById('fbg_picker').addEventListener('change', function() {
+    // HEX를 RGB 형식으로 변환하여 입력 필드에 설정
+    document.getElementById('fbg').value = hexToRgb(this.value);
+});
+
+document.getElementById('fbg').addEventListener('change', function() {
+    const value = this.value.trim();
+    const picker = document.getElementById('fbg_picker');
+    const pickerWrapper = picker.parentElement;
+
+    // Transparent 처리
+    if (value.toLowerCase() === 'transparent') {
+        // 컬러피커 숨기기
+        picker.classList.add('color-picker-hidden');
+
+        // 투명 패턴 미리보기 추가
+        let transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+        if (!transparentPreview) {
+            transparentPreview = document.createElement('div');
+            transparentPreview.className = 'color-preview-transparent';
+            transparentPreview.title = 'Transparent';
+            pickerWrapper.appendChild(transparentPreview);
+        }
+    } else {
+        // 컬러피커 보이기
+        picker.classList.remove('color-picker-hidden');
+
+        // 투명 패턴 미리보기 제거
+        const transparentPreview = pickerWrapper.querySelector('.color-preview-transparent');
+        if (transparentPreview) {
+            transparentPreview.remove();
+        }
+
+        // HEX 형식인 경우
+        if (value.match(/^#[0-9A-F]{6}$/i)) {
+            picker.value = value;
+            // HEX를 RGB로 변환하여 다시 설정
+            this.value = hexToRgb(value);
+        }
+        // RGB 형식인 경우 (예: "255, 204, 0")
+        else if (value.match(/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/)) {
+            picker.value = rgbToHex(value);
+        }
+    }
+});
+
+// 페이지 로드 시 기존 값이 있으면 변환
+window.addEventListener('DOMContentLoaded', function() {
+    const fcolorInput = document.getElementById('fcolor');
+    const fbgInput = document.getElementById('fbg');
+
+    // fcolor 초기값 처리
+    if (fcolorInput.value) {
+        const fcolorValue = fcolorInput.value.trim();
+        const picker = document.getElementById('fcolor_picker');
+        const pickerWrapper = picker.parentElement;
+
+        // Transparent 처리
+        if (fcolorValue.toLowerCase() === 'transparent') {
+            // 컬러피커 숨기기
+            picker.classList.add('color-picker-hidden');
+
+            // 투명 패턴 미리보기 추가
+            const transparentPreview = document.createElement('div');
+            transparentPreview.className = 'color-preview-transparent';
+            transparentPreview.title = 'Transparent';
+            pickerWrapper.appendChild(transparentPreview);
+        }
+        // HEX 형식이면 RGB로 변환
+        else if (fcolorValue.match(/^#[0-9A-F]{6}$/i)) {
+            fcolorInput.value = hexToRgb(fcolorValue);
+            picker.value = fcolorValue;
+        }
+        // RGB 형식이면 컬러피커에 HEX 설정
+        else if (fcolorValue.match(/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/)) {
+            picker.value = rgbToHex(fcolorValue);
+        }
+        // 색상 이름이면 그대로 유지
+        else if (typeof fcolorValue === 'string' && fcolorValue !== '') {
+            // 색상 이름이 매핑에 있으면 컬러피커 설정
+            Object.keys(colorMap).forEach(color => {
+                if (fcolorValue.toLowerCase() === color.toLowerCase() && color !== 'Transparent') {
+                    picker.value = colorMap[color].hex;
+                }
+            });
+        }
+    }
+
+    // fbg 초기값 처리
+    if (fbgInput.value) {
+        const fbgValue = fbgInput.value.trim();
+        const picker = document.getElementById('fbg_picker');
+        const pickerWrapper = picker.parentElement;
+
+        // Transparent 처리
+        if (fbgValue.toLowerCase() === 'transparent') {
+            // 컬러피커 숨기기
+            picker.classList.add('color-picker-hidden');
+
+            // 투명 패턴 미리보기 추가
+            const transparentPreview = document.createElement('div');
+            transparentPreview.className = 'color-preview-transparent';
+            transparentPreview.title = 'Transparent';
+            pickerWrapper.appendChild(transparentPreview);
+        }
+        // HEX 형식이면 RGB로 변환
+        else if (fbgValue.match(/^#[0-9A-F]{6}$/i)) {
+            fbgInput.value = hexToRgb(fbgValue);
+            picker.value = fbgValue;
+        }
+        // RGB 형식이면 컬러피커에 HEX 설정
+        else if (fbgValue.match(/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/)) {
+            picker.value = rgbToHex(fbgValue);
+        }
+        // 색상 이름이면 그대로 유지
+        else if (typeof fbgValue === 'string' && fbgValue !== '') {
+            // 색상 이름이 매핑에 있으면 컬러피커 설정
+            Object.keys(colorMap).forEach(color => {
+                if (fbgValue.toLowerCase() === color.toLowerCase() && color !== 'Transparent') {
+                    picker.value = colorMap[color].hex;
+                }
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

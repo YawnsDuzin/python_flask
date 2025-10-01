@@ -1,0 +1,40 @@
+
+# 별도로 실행
+# python -m pip install --upgrade pip
+
+
+# Flask web framework and core dependencies
+flask>=2.0.0
+
+# Environment variables management
+python-dotenv>=0.19.0
+
+# System monitoring
+psutil>=5.9.0
+
+# PyQt5 for SocketServer_SensorTest.py GUI application
+# PyQt5>=5.15.0
+
+# PyQt5 완전 재설치 방법:
+# pip uninstall PyQt5 PyQt5-Qt5 PyQt5-sip
+# pip install PyQt5
+PyQt5>=5.15.0
+
+# Build to executable
+pyinstaller>=5.0.0
+
+# Password hashing for secure authentication
+bcrypt>=4.0.0
+
+# Built-in Python modules (no installation required):
+# - sqlite3: Database operations
+# - os: Operating system interface
+# - json: JSON parsing
+# - subprocess: Process management
+# - re: Regular expressions
+# - datetime: Date and time handling
+# - socket: Network communication
+# - threading: Multi-threading support
+# - time: Time-related functions
+# - functools: Higher-order functions and operations on callable objects
+# - queue: Synchronized queue classes

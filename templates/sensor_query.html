@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% block title %}{% if sensor_data %}{{ sensor_name }} 데이터 조회 결과{% else %}센서 데이터 조회{% endif %} - IT Log Device Manager{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    {% if sensor_data %}
+    <div>
+        <h2><i class="fas fa-chart-line"></i> {{ sensor_name }} 데이터 조회 결과</h2>
+        <p class="text-muted mb-0">
+            {% if all_data %}
+                <i class="fas fa-globe"></i> 전체 데이터 조회
+            {% else %}
+                <i class="fas fa-calendar"></i> {{ start_date }} ~ {{ end_date }}
+            {% endif %}
+            <span class="mx-2">|</span>
+            <i class="fas fa-database"></i> {{ sensor_data|length }}건의 데이터
+        </p>
+    </div>
+    <div>
+        <button onclick="exportData()" class="btn btn-success">
+            <i class="fas fa-download"></i> 데이터 내보내기
+        </button>
+    </div>
+    {% else %}
+    <h2><i class="fas fa-chart-line"></i> 센서 데이터 조회</h2>
+    {% endif %}
+</div>
+
+<!-- 조회 폼 -->
+<div class="row" id="querySection">
+    <div class="col-md-12">
+        <div class="card {% if sensor_data %}mb-4{% endif %}">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-search"></i> 조회 조건 설정</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row align-items-end g-3">
+                        <div class="col-md-12 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="all_data" name="all_data" 
+                                       style="transform: scale(1.2);"
+                                       {% if selected_all %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="all_data">
+                                    전체조회
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="sensor_type" class="form-label"><strong>센서 타입 <span class="text-danger">*</span></strong></label>
+                            <select class="form-select" id="sensor_type" name="sensor_type" required>
+                                {% for table, name in sensor_types %}
+                                <option value="{{ table }}" {% if selected_sensor == table %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="start_date" class="form-label"><strong>조회 시작일 <span class="text-danger" id="start_required">*</span></strong></label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" 
+                                   value="{{ selected_start or '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="start_time" class="form-label"><strong>시간</strong></label>
+                            <input type="time" class="form-control" id="start_time" name="start_time" 
+                                   value="{{ selected_start_time or '00:00' }}">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="end_date" class="form-label"><strong>조회 종료일 <span class="text-danger" id="end_required">*</span></strong></label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" 
+                                   value="{{ selected_end or '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="end_time" class="form-label"><strong>시간</strong></label>
+                            <input type="time" class="form-control" id="end_time" name="end_time" 
+                                   value="{{ selected_end_time or '23:59' }}">
+                        </div>
+                        
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-outline-primary" style="padding: 8px 16px; font-size: 1.1rem; white-space: nowrap;">
+                                <i class="fas fa-search"></i> 조회
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not sensor_data %}
+<!-- 조회 안내 (결과가 없을 때만 표시) -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> 조회 안내</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>센서 타입:</strong> 조회하고자 하는 센서의 종류를 선택해주세요.</li>
+                    <li><strong>날짜 및 시간 범위:</strong> 조회할 기간과 시간을 설정해주세요. (시작일시 ~ 종료일시)</li>
+                    <li><strong>시간 설정:</strong> 기본값은 00:00 ~ 23:59 (하루 전체)입니다.</li>
+                    <li><strong>전체조회:</strong> 체크시 날짜에 관계없이 모든 데이터를 조회합니다.</li>
+                    <li><strong>조회 제한:</strong> 성능을 위해 최대 1,000개의 최신 데이터만 표시됩니다.</li>
+                    <li><strong>정렬 순서:</strong> 최신 데이터부터 표시됩니다.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if sensor_data %}
+<!-- 조회 결과 -->
+<div class="card" id="resultsSection">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-table"></i> {{ sensor_name }} 센서 데이터 
+            <small class="opacity-75">(최대 1,000개 표시)</small>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0" id="sensorTable">
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        {% if sensor_data and sensor_data|length > 0 %}
+                            {% for key in sensor_data[0].keys() %}
+                                {% if key == 'check_time' %}
+                                <th>시간</th>
+                                {% else %}
+                                <th>{{ key|upper }}</th>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <th>데이터 없음</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in sensor_data %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        {% for key, value in row.items() %}
+                            {% if key == 'check_time' %}
+                            <td class="text-nowrap">
+                                {% if value %}
+                                    {% set time_parts = value.split(' ') %}
+                                    {% if time_parts|length >= 2 %}
+                                        <small class="text-muted d-block">{{ time_parts[0] }}</small>
+                                        <strong>{{ time_parts[1][:8] }}</strong>
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            {% else %}
+                            <td>
+                                {% if value is not none %}
+                                    {% if value is number %}
+                                        {{ "%.2f"|format(value) }}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> 조회 정보</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm mb-0">
+                    <tr>
+                        <th width="40%">센서 타입:</th>
+                        <td><strong>{{ sensor_name }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>테이블명:</th>
+                        <td><code>{{ sensor_type }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>조회 기간:</th>
+                        <td>
+                            {% if all_data %}
+                                <span class="badge bg-success">전체 데이터</span>
+                            {% else %}
+                                {{ start_date }} ~ {{ end_date }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>데이터 수:</th>
+                        <td><span class="badge bg-primary">{{ sensor_data|length }}건</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> 주의사항</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li>데이터는 최신순으로 정렬되어 표시됩니다.</li>
+                    <li>성능을 위해 최대 1,000개까지만 표시됩니다.</li>
+                    <li>수치 데이터는 소수점 둘째 자리까지 표시됩니다.</li>
+                    <li>데이터 내보내기 기능을 통해 CSV 형태로 저장할 수 있습니다.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="text-center py-5" style="display: none;" id="noDataMessage">
+    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">조회된 데이터가 없습니다</h4>
+    <p class="text-muted">선택한 조건에 맞는 센서 데이터가 존재하지 않습니다.</p>
+</div>
+{% endif %}
+
+<!-- 페이지 하단 여백 -->
+<div class="mb-5"></div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+// 페이지 로드시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+    const startTime = document.getElementById('start_time');
+    const endTime = document.getElementById('end_time');
+    const allDataCheckbox = document.getElementById('all_data');
+    const startRequired = document.getElementById('start_required');
+    const endRequired = document.getElementById('end_required');
+    
+    // 폼 값이 없는 경우에만 기본값 설정
+    if (!startDate.value && !endDate.value) {
+        const today = new Date().toISOString().split('T')[0];
+        // 조회시작일과 종료일 모두 현재 날짜로 설정
+        startDate.value = today;
+        endDate.value = today;
+    }
+    
+    // 시간 기본값 설정 (값이 없는 경우에만)
+    if (!startTime.value) {
+        startTime.value = '00:00';
+    }
+    if (!endTime.value) {
+        endTime.value = '23:59';
+    }
+    
+    // 전체조회 체크박스 이벤트 처리
+    function toggleDateRequirement() {
+        const isAllData = allDataCheckbox.checked;
+        
+        if (isAllData) {
+            // 전체조회 선택시 날짜/시간 입력 불필요
+            startDate.required = false;
+            endDate.required = false;
+            startDate.disabled = true;
+            endDate.disabled = true;
+            startTime.disabled = true;
+            endTime.disabled = true;
+            startRequired.style.display = 'none';
+            endRequired.style.display = 'none';
+        } else {
+            // 일반 조회시 날짜 입력 필요
+            startDate.required = true;
+            endDate.required = true;
+            startDate.disabled = false;
+            endDate.disabled = false;
+            startTime.disabled = false;
+            endTime.disabled = false;
+            startRequired.style.display = 'inline';
+            endRequired.style.display = 'inline';
+        }
+    }
+    
+    // 초기 상태 설정
+    toggleDateRequirement();
+    
+    // 체크박스 변경시 상태 업데이트
+    allDataCheckbox.addEventListener('change', toggleDateRequirement);
+    
+    // 결과가 있으면 스크롤을 결과 영역으로 이동
+    {% if sensor_data %}
+    setTimeout(function() {
+        document.getElementById('resultsSection').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }, 100);
+    {% endif %}
+});
+
+// 폼 제출 전 유효성 검사
+document.querySelector('form').addEventListener('submit', function(e) {
+    const sensorType = document.getElementById('sensor_type').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const allData = document.getElementById('all_data').checked;
+    
+    if (!sensorType) {
+        e.preventDefault();
+        alert('센서 타입을 선택해주세요.');
+        return;
+    }
+    
+    if (!allData) {
+        if (!startDate || !endDate) {
+            e.preventDefault();
+            alert('전체조회가 체크되지 않은 경우 조회 시작일과 종료일을 모두 입력해주세요.');
+            return;
+        }
+        
+        if (new Date(startDate) > new Date(endDate)) {
+            e.preventDefault();
+            alert('시작일이 종료일보다 늦을 수 없습니다.');
+            return;
+        }
+    }
+});
+
+
+// 데이터 내보내기 기능
+function exportData() {
+    const table = document.getElementById('sensorTable');
+    if (!table) {
+        alert('내보낼 데이터가 없습니다.');
+        return;
+    }
+    
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = [], cols = rows[i].querySelectorAll('td, th');
+        
+        for (let j = 0; j < cols.length; j++) {
+            let cellText = cols[j].innerText.replace(/\s+/g, ' ').trim();
+            // CSV에서 쉼표와 따옴표 처리
+            if (cellText.includes(',') || cellText.includes('"') || cellText.includes('\n')) {
+                cellText = '"' + cellText.replace(/"/g, '""') + '"';
+            }
+            row.push(cellText);
+        }
+        
+        csv.push(row.join(','));
+    }
+    
+    // CSV 파일 다운로드
+    const csvString = csv.join('\n');
+    const blob = new Blob(['\ufeff' + csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        {% if sensor_data %}
+        link.setAttribute('download', '{{ sensor_name }}_데이터_{% if all_data %}전체{% else %}{{ start_date }}_{{ end_date }}{% endif %}.csv');
+        {% else %}
+        link.setAttribute('download', '센서데이터.csv');
+        {% endif %}
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        alert('브라우저에서 파일 다운로드를 지원하지 않습니다.');
+    }
+}
+
+// 테이블이 길 때 스크롤 안내
+document.addEventListener('DOMContentLoaded', function() {
+    {% if sensor_data %}
+    const tableContainer = document.querySelector('.table-responsive');
+    if (tableContainer && tableContainer.scrollWidth > tableContainer.clientWidth) {
+        // 스크롤 가능할 때 사용자에게 알림
+        const scrollHint = document.createElement('div');
+        scrollHint.className = 'alert alert-info alert-dismissible fade show mt-2';
+        scrollHint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> 테이블을 좌우로 스크롤하여 모든 열을 확인할 수 있습니다. <button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        tableContainer.parentNode.insertBefore(scrollHint, tableContainer);
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

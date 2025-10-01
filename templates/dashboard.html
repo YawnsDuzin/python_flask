@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}대시보드 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt"></i> 시스템 대시보드</h2>
+    <div class="d-flex align-items-center">
+        <small class="text-muted me-3" id="last-update">마지막 업데이트: 로딩 중...</small>
+        <div class="me-2">
+            <select class="form-select form-select-sm" id="refresh-interval" onchange="changeRefreshInterval()">
+                <option value="10000">10초마다</option>
+                <option value="15000" selected>15초마다</option>
+                <option value="30000">30초마다</option>
+                <option value="60000">1분마다</option>
+                <option value="0">자동 새로고침 끄기</option>
+            </select>
+        </div>
+        <button onclick="refreshSystemInfo()" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-sync-alt"></i> 새로고침
+        </button>
+    </div>
+</div>
+
+<!-- 시스템 요약 카드들 -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-microchip fa-2x"></i>
+                </div>
+                <div>
+                    <div class="fs-6">CPU 사용률</div>
+                    <div class="fs-4 fw-bold" id="cpu-usage">
+                        {% if system_info %}{{ system_info.cpu.usage_percent }}%{% else %}--{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-memory fa-2x"></i>
+                </div>
+                <div>
+                    <div class="fs-6">메모리 사용률</div>
+                    <div class="fs-4 fw-bold" id="memory-usage">
+                        {% if system_info %}{{ system_info.memory.percent }}%{% else %}--{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-thermometer-half fa-2x"></i>
+                </div>
+                <div>
+                    <div class="fs-6">CPU 온도</div>
+                    <div class="fs-4 fw-bold" id="cpu-temp">
+                        {% if system_info %}{{ system_info.cpu.temperature }}°C{% else %}--{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-hdd fa-2x"></i>
+                </div>
+                <div>
+                    <div class="fs-6">디스크 사용률</div>
+                    <div class="fs-4 fw-bold" id="disk-usage">
+                        {% if system_info %}{{ "%.1f"|format(system_info.disk.usage.percent) }}%{% else %}--{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 상세 시스템 정보 -->
+<div class="row">
+    <!-- 시스템 정보 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-server"></i> 시스템 정보</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="40%">CPU 코어 수:</th>
+                        <td id="cpu-count">{% if system_info %}{{ system_info.cpu.count }}개{% else %}--{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th>시스템 가동시간:</th>
+                        <td id="uptime">{% if system_info %}{{ system_info.system.uptime_string }}{% else %}--{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th>부팅 시간:</th>
+                        <td id="boot-time">
+                            {% if system_info %}
+                                {{ system_info.system.boot_time[:19].replace('T', ' ') }}
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>마지막 업데이트:</th>
+                        <td id="timestamp">
+                            {% if system_info %}
+                                {{ system_info.timestamp[:19].replace('T', ' ') }}
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메모리 상세 정보 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-memory"></i> 메모리 상세</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="40%">전체 메모리:</th>
+                        <td id="memory-total">
+                            {% if system_info %}
+                                {{ (system_info.memory.total / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>사용 중:</th>
+                        <td id="memory-used">
+                            {% if system_info %}
+                                {{ (system_info.memory.used / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>사용 가능:</th>
+                        <td id="memory-available">
+                            {% if system_info %}
+                                {{ (system_info.memory.available / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>여유 공간:</th>
+                        <td id="memory-free">
+                            {% if system_info %}
+                                {{ (system_info.memory.free / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 호스트명 및 네트워크 인터페이스 -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-server"></i> 호스트 정보</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <table class="table table-borderless mb-0">
+                            <tr>
+                                <th width="40%">호스트명:</th>
+                                <td id="hostname">
+                                    {% if system_info %}{{ system_info.network.interfaces.hostname }}{% else %}--{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>주 IP 주소:</th>
+                                <td id="primary-ip">
+                                    {% if system_info %}{{ system_info.network.interfaces.primary_ip }}{% else %}--{% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-9">
+                        <h6 class="mb-2">네트워크 인터페이스</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>인터페이스</th>
+                                        <th>IP 주소</th>
+                                        <th>서브넷 마스크</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="network-interfaces">
+                                    {% if system_info and system_info.network.interfaces.interfaces %}
+                                        {% for interface in system_info.network.interfaces.interfaces %}
+                                        <tr>
+                                            <td><code>{{ interface.name }}</code></td>
+                                            <td>{{ interface.ip }}</td>
+                                            <td>{{ interface.netmask }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-muted">네트워크 인터페이스 정보 없음</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 네트워크 I/O 및 디스크 정보 -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-network-wired"></i> 네트워크 I/O</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="40%">전송된 데이터:</th>
+                        <td id="net-sent">
+                            {% if system_info %}
+                                {{ (system_info.network.io.bytes_sent / 1024**2)|round(1) }} MB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>수신된 데이터:</th>
+                        <td id="net-recv">
+                            {% if system_info %}
+                                {{ (system_info.network.io.bytes_recv / 1024**2)|round(1) }} MB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>업로드 속도:</th>
+                        <td id="upload-speed">
+                            {% if system_info %}
+                                {{ (system_info.network.speed.upload_speed / 1024)|round(1) }} KB/s
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>다운로드 속도:</th>
+                        <td id="download-speed">
+                            {% if system_info %}
+                                {{ (system_info.network.speed.download_speed / 1024)|round(1) }} KB/s
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-hdd"></i> 저장장치</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="40%">전체 용량:</th>
+                        <td id="disk-total">
+                            {% if system_info %}
+                                {{ (system_info.disk.usage.total / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>사용 중:</th>
+                        <td id="disk-used">
+                            {% if system_info %}
+                                {{ (system_info.disk.usage.used / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>여유 공간:</th>
+                        <td id="disk-free">
+                            {% if system_info %}
+                                {{ (system_info.disk.usage.free / 1024**3)|round(2) }} GB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>읽기/쓰기:</th>
+                        <td id="disk-io">
+                            {% if system_info %}
+                                {{ (system_info.disk.io.read_bytes / 1024**2)|round(1) }} / 
+                                {{ (system_info.disk.io.write_bytes / 1024**2)|round(1) }} MB
+                            {% else %}--{% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 하단 여백 -->
+<div class="mb-4"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let autoRefreshInterval;
+
+function updateSystemInfo(data) {
+    // CPU 정보 업데이트
+    document.getElementById('cpu-usage').textContent = data.cpu.usage_percent + '%';
+    document.getElementById('cpu-count').textContent = data.cpu.count + '개';
+    document.getElementById('cpu-temp').textContent = data.cpu.temperature + '°C';
+    
+    // 메모리 정보 업데이트
+    document.getElementById('memory-usage').textContent = data.memory.percent + '%';
+    document.getElementById('memory-total').textContent = (data.memory.total / 1024**3).toFixed(2) + ' GB';
+    document.getElementById('memory-used').textContent = (data.memory.used / 1024**3).toFixed(2) + ' GB';
+    document.getElementById('memory-available').textContent = (data.memory.available / 1024**3).toFixed(2) + ' GB';
+    document.getElementById('memory-free').textContent = (data.memory.free / 1024**3).toFixed(2) + ' GB';
+    
+    // 디스크 정보 업데이트
+    document.getElementById('disk-usage').textContent = data.disk.usage.percent.toFixed(1) + '%';
+    document.getElementById('disk-total').textContent = (data.disk.usage.total / 1024**3).toFixed(2) + ' GB';
+    document.getElementById('disk-used').textContent = (data.disk.usage.used / 1024**3).toFixed(2) + ' GB';
+    document.getElementById('disk-free').textContent = (data.disk.usage.free / 1024**3).toFixed(2) + ' GB';
+    
+    if (data.disk.io) {
+        document.getElementById('disk-io').textContent = 
+            (data.disk.io.read_bytes / 1024**2).toFixed(1) + ' / ' + 
+            (data.disk.io.write_bytes / 1024**2).toFixed(1) + ' MB';
+    }
+    
+    // 네트워크 정보 업데이트
+    if (data.network.io) {
+        document.getElementById('net-sent').textContent = (data.network.io.bytes_sent / 1024**2).toFixed(1) + ' MB';
+        document.getElementById('net-recv').textContent = (data.network.io.bytes_recv / 1024**2).toFixed(1) + ' MB';
+    }
+    
+    document.getElementById('upload-speed').textContent = (data.network.speed.upload_speed / 1024).toFixed(1) + ' KB/s';
+    document.getElementById('download-speed').textContent = (data.network.speed.download_speed / 1024).toFixed(1) + ' KB/s';
+    
+    // 호스트 정보 업데이트
+    if (data.network.interfaces) {
+        document.getElementById('hostname').textContent = data.network.interfaces.hostname;
+        document.getElementById('primary-ip').textContent = data.network.interfaces.primary_ip;
+        
+        // 네트워크 인터페이스 테이블 업데이트
+        const interfaceTableBody = document.getElementById('network-interfaces');
+        if (data.network.interfaces.interfaces && data.network.interfaces.interfaces.length > 0) {
+            let tableRows = '';
+            data.network.interfaces.interfaces.forEach(function(interface) {
+                tableRows += `
+                    <tr>
+                        <td><code>${interface.name}</code></td>
+                        <td>${interface.ip}</td>
+                        <td>${interface.netmask}</td>
+                    </tr>
+                `;
+            });
+            interfaceTableBody.innerHTML = tableRows;
+        } else {
+            interfaceTableBody.innerHTML = '<tr><td colspan="3" class="text-muted">네트워크 인터페이스 정보 없음</td></tr>';
+        }
+    }
+    
+    // 시스템 정보 업데이트
+    document.getElementById('uptime').textContent = data.system.uptime_string;
+    document.getElementById('boot-time').textContent = data.system.boot_time.substring(0, 19).replace('T', ' ');
+    document.getElementById('timestamp').textContent = data.timestamp.substring(0, 19).replace('T', ' ');
+    
+    // 마지막 업데이트 시간
+    document.getElementById('last-update').textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
+}
+
+function refreshSystemInfo() {
+    fetch('/api/system-status')
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                updateSystemInfo(result.data);
+            } else {
+                console.error('시스템 정보 로드 실패:', result.error);
+            }
+        })
+        .catch(error => {
+            console.error('API 호출 오류:', error);
+        });
+}
+
+let isTabActive = true;
+let refreshIntervalMs = 15000; // 기본값: 15초 (라즈베리파이 부하 고려)
+
+function changeRefreshInterval() {
+    const select = document.getElementById('refresh-interval');
+    refreshIntervalMs = parseInt(select.value);
+    
+    // 기존 인터벌 정리 후 새로 시작
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+    
+    if (refreshIntervalMs > 0 && isTabActive) {
+        startAutoRefresh();
+    }
+    
+    // 사용자 피드백
+    const lastUpdate = document.getElementById('last-update');
+    if (refreshIntervalMs === 0) {
+        lastUpdate.textContent = '자동 새로고침이 비활성화되었습니다';
+    } else {
+        lastUpdate.textContent = `${refreshIntervalMs/1000}초 간격으로 자동 새로고침 설정됨`;
+    }
+}
+
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    if (isTabActive) {
+        autoRefreshInterval = setInterval(function() {
+            if (isTabActive) {
+                refreshSystemInfo();
+            }
+        }, refreshIntervalMs);
+    }
+}
+
+// 탭 활성화/비활성화 감지
+document.addEventListener('visibilitychange', function() {
+    isTabActive = !document.hidden;
+    
+    if (isTabActive) {
+        // 탭이 활성화되면 즉시 새로고침 후 자동 새로고침 시작
+        refreshSystemInfo();
+        startAutoRefresh();
+    } else {
+        // 탭이 비활성화되면 자동 새로고침 중단
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+    }
+});
+
+// 페이지 로드 시 자동 새로고침 시작
+document.addEventListener('DOMContentLoaded', function() {
+    // 초기 로드
+    setTimeout(refreshSystemInfo, 1000);
+    
+    // 자동 새로고침 시작
+    setTimeout(startAutoRefresh, 2000);
+});
+
+// 페이지 언로드 시 인터벌 정리
+window.addEventListener('beforeunload', function() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+});
+</script>
+{% endblock %}

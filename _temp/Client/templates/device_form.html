@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('device.device_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                {% if device %}
+                <div class="mb-3">
+                    <label for="idx" class="form-label">디바이스 ID</label>
+                    <input type="text" class="form-control" id="idx" name="idx" 
+                           value="{{ device.idx }}" readonly>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">디바이스 명 *</label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           value="{{ device.name if device else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">디바이스 타입</label>
+                    <input type="text" class="form-control" id="type" name="type" 
+                           value="{{ device.type if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="mode" class="form-label">디바이스 모드</label>
+                    <input type="text" class="form-control" id="mode" name="mode" 
+                           value="{{ device.mode if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="use" class="form-label">디바이스 사용유무</label>
+                    <select class="form-control" id="use" name="use">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if device and device.use == 'Y' %}selected{% endif %}>Y (사용)</option>
+                        <option value="N" {% if device and device.use == 'N' %}selected{% endif %}>N (미사용)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h5><i class="fas fa-cogs"></i> 연결 설정</h5>
+                <div class="mb-3">
+                    <label for="port" class="form-label">디바이스 통신포트</label>
+                    <input type="text" class="form-control" id="port" name="port" 
+                           value="{{ device.port if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="delay" class="form-label">지연시간(센서통신)</label>
+                    <input type="text" class="form-control" id="delay" name="delay" 
+                           value="{{ device.delay if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="save_sec" class="form-label">저장주기(DB)</label>
+                    <input type="text" class="form-control" id="save_sec" name="save_sec" 
+                           value="{{ device.save_sec if device else '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-calculator"></i> 계산 및 포인트</h5>
+                <div class="mb-3">
+                    <label for="point" class="form-label">표시(소수점)</label>
+                    <input type="text" class="form-control" id="point" name="point" 
+                           value="{{ device.point if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="math" class="form-label">센서데이터 조정값</label>
+                    <input type="text" class="form-control" id="math" name="math" 
+                           value="{{ device.math if device else '' }}">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h5><i class="fas fa-traffic-light"></i> 상태 임계값</h5>
+                <div class="mb-3">
+                    <label for="good" class="form-label">양호 (Good)</label>
+                    <input type="text" class="form-control" id="good" name="good" 
+                           value="{{ device.good if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="normal" class="form-label">보통 (Normal)</label>
+                    <input type="text" class="form-control" id="normal" name="normal" 
+                           value="{{ device.normal if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="warning" class="form-label">경고 (Warning)</label>
+                    <input type="text" class="form-control" id="warning" name="warning" 
+                           value="{{ device.warning if device else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="danger" class="form-label">위험 (Danger)</label>
+                    <input type="text" class="form-control" id="danger" name="danger" 
+                           value="{{ device.danger if device else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h5><i class="fas fa-sliders-h"></i> 추가 옵션</h5>
+        <div class="row">
+            <div class="col-md-6">
+                {% for i in range(1, 6) %}
+                <div class="mb-3">
+                    <label for="option{{ i }}" class="form-label">옵션 {{ i }}</label>
+                    <input type="text" class="form-control" id="option{{ i }}" name="option{{ i }}" 
+                           value="{{ device['option' + i|string] if device else '' }}">
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                {% for i in range(6, 11) %}
+                <div class="mb-3">
+                    <label for="option{{ i }}" class="form-label">옵션 {{ i }}</label>
+                    <input type="text" class="form-control" id="option{{ i }}" name="option{{ i }}" 
+                           value="{{ device['option' + i|string] if device else '' }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('device.device_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}

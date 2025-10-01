@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('device.led_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> 기본 설정</h5>
+                {% if led_item %}
+                <div class="mb-3">
+                    <label for="idx" class="form-label">전광판 ID</label>
+                    <input type="text" class="form-control" id="idx" name="idx" 
+                           value="{{ led_item.idx }}" readonly>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <label for="type" class="form-label">센서 타입</label>
+                    <input type="text" class="form-control" id="type" name="type" 
+                           value="{{ led_item.type if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="mode" class="form-label">전광판 모드</label>
+                    <input type="text" class="form-control" id="mode" name="mode" 
+                           value="{{ led_item.mode if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="port" class="form-label">전광판 통신포트</label>
+                    <input type="text" class="form-control" id="port" name="port" 
+                           value="{{ led_item.port if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="use" class="form-label">전광판 사용유무</label>
+                    <select class="form-control" id="use" name="use">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if led_item and led_item.use == 'Y' %}selected{% endif %}>Y (사용)</option>
+                        <option value="N" {% if led_item and led_item.use == 'N' %}selected{% endif %}>N (미사용)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="display_sec" class="form-label">전광판 표시시간(초)</label>
+                    <input type="text" class="form-control" id="display_sec" name="display_sec" 
+                           value="{{ led_item.display_sec if led_item else '' }}">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h5><i class="fas fa-lightbulb"></i> 라인1 설정</h5>
+                <div class="mb-3">
+                    <label for="line1_mode" class="form-label">라인1 모드</label>
+                    <input type="text" class="form-control" id="line1_mode" name="line1_mode" 
+                           value="{{ led_item.line1_mode if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_header" class="form-label">라인1 헤더</label>
+                    <input type="text" class="form-control" id="line1_header" name="line1_header" 
+                           value="{{ led_item.line1_header if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_hcolor" class="form-label">라인1 헤더색</label>
+                    <input type="text" class="form-control" id="line1_hcolor" name="line1_hcolor" 
+                           value="{{ led_item.line1_hcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_tail" class="form-label">라인1 꼬리</label>
+                    <input type="text" class="form-control" id="line1_tail" name="line1_tail" 
+                           value="{{ led_item.line1_tail if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_tcolor" class="form-label">라인1 꼬리색</label>
+                    <input type="text" class="form-control" id="line1_tcolor" name="line1_tcolor" 
+                           value="{{ led_item.line1_tcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_gcolor" class="form-label">라인1 양호색</label>
+                    <input type="text" class="form-control" id="line1_gcolor" name="line1_gcolor" 
+                           value="{{ led_item.line1_gcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_ncolor" class="form-label">라인1 보통색</label>
+                    <input type="text" class="form-control" id="line1_ncolor" name="line1_ncolor" 
+                           value="{{ led_item.line1_ncolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_wcolor" class="form-label">라인1 경고색</label>
+                    <input type="text" class="form-control" id="line1_wcolor" name="line1_wcolor" 
+                           value="{{ led_item.line1_wcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_dcolor" class="form-label">라인1 위험색</label>
+                    <input type="text" class="form-control" id="line1_dcolor" name="line1_dcolor" 
+                           value="{{ led_item.line1_dcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_sec" class="form-label">라인1 초</label>
+                    <input type="text" class="form-control" id="line1_sec" name="line1_sec" 
+                           value="{{ led_item.line1_sec if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_msg" class="form-label">라인1 메시지</label>
+                    <input type="text" class="form-control" id="line1_msg" name="line1_msg" 
+                           value="{{ led_item.line1_msg if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_len" class="form-label">라인1 길이</label>
+                    <input type="text" class="form-control" id="line1_len" name="line1_len" 
+                           value="{{ led_item.line1_len if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line1_act" class="form-label">라인1 액션</label>
+                    <input type="text" class="form-control" id="line1_act" name="line1_act" 
+                           value="{{ led_item.line1_act if led_item else '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-lightbulb"></i> 라인2 설정</h5>
+                <div class="mb-3">
+                    <label for="line2_mode" class="form-label">라인2 모드</label>
+                    <input type="text" class="form-control" id="line2_mode" name="line2_mode" 
+                           value="{{ led_item.line2_mode if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_header" class="form-label">라인2 헤더</label>
+                    <input type="text" class="form-control" id="line2_header" name="line2_header" 
+                           value="{{ led_item.line2_header if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_hcolor" class="form-label">라인2 헤더색</label>
+                    <input type="text" class="form-control" id="line2_hcolor" name="line2_hcolor" 
+                           value="{{ led_item.line2_hcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_tail" class="form-label">라인2 꼬리</label>
+                    <input type="text" class="form-control" id="line2_tail" name="line2_tail" 
+                           value="{{ led_item.line2_tail if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_tcolor" class="form-label">라인2 꼬리색</label>
+                    <input type="text" class="form-control" id="line2_tcolor" name="line2_tcolor" 
+                           value="{{ led_item.line2_tcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_gcolor" class="form-label">라인2 양호색</label>
+                    <input type="text" class="form-control" id="line2_gcolor" name="line2_gcolor" 
+                           value="{{ led_item.line2_gcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_ncolor" class="form-label">라인2 보통색</label>
+                    <input type="text" class="form-control" id="line2_ncolor" name="line2_ncolor" 
+                           value="{{ led_item.line2_ncolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_wcolor" class="form-label">라인2 경고색</label>
+                    <input type="text" class="form-control" id="line2_wcolor" name="line2_wcolor" 
+                           value="{{ led_item.line2_wcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_dcolor" class="form-label">라인2 위험색</label>
+                    <input type="text" class="form-control" id="line2_dcolor" name="line2_dcolor" 
+                           value="{{ led_item.line2_dcolor if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_sec" class="form-label">라인2 초</label>
+                    <input type="text" class="form-control" id="line2_sec" name="line2_sec" 
+                           value="{{ led_item.line2_sec if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_msg" class="form-label">라인2 메시지</label>
+                    <input type="text" class="form-control" id="line2_msg" name="line2_msg" 
+                           value="{{ led_item.line2_msg if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_len" class="form-label">라인2 길이</label>
+                    <input type="text" class="form-control" id="line2_len" name="line2_len" 
+                           value="{{ led_item.line2_len if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="line2_act" class="form-label">라인2 액션</label>
+                    <input type="text" class="form-control" id="line2_act" name="line2_act" 
+                           value="{{ led_item.line2_act if led_item else '' }}">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h5><i class="fas fa-ad"></i> 광고 및 밝기 설정</h5>
+                <div class="mb-3">
+                    <label for="led_ad" class="form-label">LED 광고</label>
+                    <input type="text" class="form-control" id="led_ad" name="led_ad" 
+                           value="{{ led_item.led_ad if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="ad_sec" class="form-label">광고 초</label>
+                    <input type="text" class="form-control" id="ad_sec" name="ad_sec" 
+                           value="{{ led_item.ad_sec if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="ad_intv" class="form-label">광고 간격</label>
+                    <input type="text" class="form-control" id="ad_intv" name="ad_intv" 
+                           value="{{ led_item.ad_intv if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="ad_line1" class="form-label">광고 라인1</label>
+                    <input type="text" class="form-control" id="ad_line1" name="ad_line1" 
+                           value="{{ led_item.ad_line1 if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="ad_line2" class="form-label">광고 라인2</label>
+                    <input type="text" class="form-control" id="ad_line2" name="ad_line2" 
+                           value="{{ led_item.ad_line2 if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="bright_start" class="form-label">밝기 시작</label>
+                    <input type="text" class="form-control" id="bright_start" name="bright_start" 
+                           value="{{ led_item.bright_start if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="bright_end" class="form-label">밝기 끝</label>
+                    <input type="text" class="form-control" id="bright_end" name="bright_end" 
+                           value="{{ led_item.bright_end if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="bright_max" class="form-label">최대 밝기</label>
+                    <input type="text" class="form-control" id="bright_max" name="bright_max" 
+                           value="{{ led_item.bright_max if led_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="bright_min" class="form-label">최소 밝기</label>
+                    <input type="text" class="form-control" id="bright_min" name="bright_min" 
+                           value="{{ led_item.bright_min if led_item else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('device.led_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}

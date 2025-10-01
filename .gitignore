@@ -1,0 +1,365 @@
+# ========================================
+# Python
+# ========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+release/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# ========================================
+# Flask
+# ========================================
+
+instance/
+.webassets-cache
+
+# ========================================
+# Environments
+# ========================================
+
+# Virtual environments
+venv/
+ENV/
+env/
+venv_webapp/
+.venv/
+.ENV/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+*.env
+
+# ========================================
+# Database
+# ========================================
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Database backups
+*.bak
+*.backup
+*.sql
+
+# ========================================
+# IDEs and Editors
+# ========================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ========================================
+# Operating System
+# ========================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# Logs and Temporary Files
+# ========================================
+
+# Log files
+*.log
+logs/
+log/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.tmp/
+temp/
+tmp/
+
+# ========================================
+# Security and Credentials
+# ========================================
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.cert
+*.pfx
+*.p12
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+id_ed25519
+id_ed25519.pub
+
+# AWS credentials
+.aws/
+
+# Config files with secrets
+config.ini
+secrets.json
+credentials.json
+client_secret.json
+
+# ========================================
+# Project Specific
+# ========================================
+
+# Test data
+test_data/
+Extend/test_output/
+
+# Uploaded files (if stored locally)
+uploads/
+upload/
+media/
+
+# Static files collection
+staticfiles/
+
+# Compiled assets
+static/dist/
+static/build/
+
+# Session files
+flask_session/
+sessions/
+
+# Cache directories
+.cache/
+cache/
+
+# Backup files
+backup/
+backups/
+*.old
+*.orig
+
+# ========================================
+# Documentation
+# ========================================
+
+# Sphinx documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# MkDocs documentation
+/site
+
+# ========================================
+# Package Managers
+# ========================================
+
+# npm
+node_modules/
+package-lock.json
+
+# yarn
+yarn.lock
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ========================================
+# Other
+# ========================================
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# celery beat schedule file
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# ========================================
+# Custom Exclusions (Add your own below)
+# ========================================
+
+# Screenshots and test images
+screenshots/
+*.screenshot.png
+
+# Local development configuration
+local_config.py
+dev_settings.py
+
+# Personal notes
+notes.txt
+TODO.txt
+NOTES.md

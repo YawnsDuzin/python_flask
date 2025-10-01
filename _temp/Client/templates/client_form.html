@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('client.client_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> CLIENT 정보</h5>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="idx" class="form-label">CLIENT ID</label>
+                            <input type="number" class="form-control" id="idx" name="idx" 
+                                   value="{{ client_item.idx if client_item else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">디바이스 명</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ client_item.name if client_item else '' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="type" class="form-label">디바이스 타입</label>
+                            <input type="text" class="form-control" id="type" name="type" 
+                                   value="{{ client_item.type if client_item else '' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="use" class="form-label">CLIENT 사용유무</label>
+                            <select class="form-control" id="use" name="use" required>
+                                <option value="">선택하세요</option>
+                                <option value="Y" {% if client_item and client_item.use == 'Y' %}selected{% endif %}>Y (사용)</option>
+                                <option value="N" {% if client_item and client_item.use == 'N' %}selected{% endif %}>N (미사용)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="ip" class="form-label">IP(SERVER)</label>
+                            <input type="text" class="form-control" id="ip" name="ip" 
+                                   value="{{ client_item.ip if client_item else '' }}"
+                                   placeholder="예: 192.168.0.100">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="port" class="form-label">PORT(SERVER)</label>
+                            <input type="text" class="form-control" id="port" name="port" 
+                                   value="{{ client_item.port if client_item else '' }}"
+                                   placeholder="예: 3000">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="monitor" class="form-label">모니터 번호</label>
+                            <input type="text" class="form-control" id="monitor" name="monitor" 
+                                   value="{{ client_item.monitor if client_item else '' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 숨겨진 필드들 (데이터베이스 구조 유지를 위해) -->
+                <input type="hidden" name="com_mode" value="{{ client_item.com_mode if client_item else 'CLIENT' }}">
+                <input type="hidden" name="device" value="{{ client_item.device if client_item else '' }}">
+                <input type="hidden" name="mode" value="{{ client_item.mode if client_item else '' }}">
+                <input type="hidden" name="dv_no" value="{{ client_item.dv_no if client_item else '' }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('client.client_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}

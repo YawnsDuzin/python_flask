@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}setting 상세정보 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> setting 상세정보</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('device.edit_setting', code=setting.code) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        <a href="{{ url_for('device.setting_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card device-card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">현장구분 코드:</th>
+                            <td><strong>{{ setting.code or '-' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 순번:</th>
+                            <td>{{ setting.dv_no or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>SET 통신모드:</th>
+                            <td>{{ setting.mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>데이터 전송:</th>
+                            <td>{{ setting.send_data or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>모니터 사용:</th>
+                            <td>{{ setting.monitor_use or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>디버그 모드:</th>
+                            <td>{{ setting.debug or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card device-card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> 시스템 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">로그 저장:</th>
+                            <td>{{ setting.log or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>로그삭제(일자):</th>
+                            <td>{{ setting.log_del or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>재부팅 시간:</th>
+                            <td>{{ setting.reboot_time or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>사운드:</th>
+                            <td>{{ setting.sound or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>사이렌 횟수:</th>
+                            <td>{{ setting.siren_cnt or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+{% endblock %}

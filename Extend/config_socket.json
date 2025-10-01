@@ -1,0 +1,176 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 3000,
+    "max_connections": 10,
+    "timeout": 30,
+    "keepalive": true,
+    "buffer_size": 1024,
+    "description": "소켓 서버 기본 설정"
+  },
+  "simulator": {
+    "enabled": true,
+    "interval": 1.0,
+    "sensor_type": "SOUND",
+    "device_id": "2",
+    "auto_start": false,
+    "description": "센서 데이터 시뮬레이터 설정"
+  },
+  "logging": {
+    "enabled": true,
+    "max_lines": 1000,
+    "timestamp": true,
+    "log_level": "INFO",
+    "save_to_file": false,
+    "file_path": "./logs/server.log",
+    "description": "로깅 관련 설정"
+  },
+  "ui": {
+    "font_size": 9,
+    "font_family": "맑은 고딕",
+    "auto_scroll": true,
+    "show_connection_count": true,
+    "window_width": 1200,
+    "window_height": 800,
+    "splitter_ratio": [
+      400,
+      800
+    ],
+    "description": "사용자 인터페이스 설정"
+  },
+  "network_optimization": {
+    "tcp_nodelay": true,
+    "socket_reuse": true,
+    "keepalive_interval": 30,
+    "keepalive_count": 3,
+    "send_timeout": 10,
+    "recv_timeout": 30,
+    "description": "네트워크 최적화 설정"
+  },
+  "sensor_types": {
+    "PM": {
+      "name": "미세먼지",
+      "description": "PM2.5, PM10 미세먼지 센서",
+      "icon": "fas fa-smog",
+      "color": "primary",
+      "default_device_id": "1",
+      "sample_data": "1|PM||35,35,18,20,N,0,75,75,37,35,G,0,,,^192.168.0.27"
+    },
+    "SOUND": {
+      "name": "소음센서",
+      "description": "소음 레벨 측정 센서",
+      "icon": "fas fa-sound",
+      "color": "success",
+      "default_device_id": "2",
+      "sample_data": "1|SOUND||55.0,78.0,56.0,55.4,G^192.168.0.27"
+    },
+    "VIBRO": {
+      "name": "진동센서",
+      "description": "진동 측정 센서",
+      "icon": "fas fa-wave-square",
+      "color": "secondary",
+      "default_device_id": "3",
+      "sample_data": "1|VIBRO||30.0,0.0,0.0,30.0,G^192.168.0.27"
+    },
+    "TILT": {
+      "name": "기울기센서",
+      "description": "기울기 각도 측정 센서",
+      "icon": "fas fa-angle-double-right",
+      "color": "purple",
+      "default_device_id": "4",
+      "sample_data": "1|TILT||0.8,0.0,0.0,0.3,N^192.168.0.27"
+    },
+    "CRACK": {
+      "name": "균열센서",
+      "description": "균열 폭 측정 센서",
+      "icon": "fas fa-crack",
+      "color": "warning",
+      "default_device_id": "5",
+      "sample_data": "1|CRACK|MINUO|9.0,39.0,39.0,0.1,N^192.168.0.27"
+    },
+    "WIND": {
+      "name": "풍속계",
+      "description": "풍속 및 풍향 측정 센서",
+      "icon": "fas fa-wind",
+      "color": "info",
+      "default_device_id": "6",
+      "sample_data": "1|WIND|UltraSonic|4.1,10.2,5.3,5.2,G,200,SE^192.168.0.27"
+    },
+    "O2": {
+      "name": "산소센서",
+      "description": "산소 농도 측정 센서",
+      "icon": "fas fa-wind",
+      "color": "success",
+      "default_device_id": "7",
+      "sample_data": "1|O2|PER|19.90_240_30_1200,20.10,19.80,19.86,W|19.90_240_30_1200^192.168.0.27"
+    },
+    "MQ": {
+      "name": "MQ센서",
+      "description": "가연성 가스 측정 센서",
+      "icon": "fas fa-exclamation-triangle",
+      "color": "warning",
+      "default_device_id": "8",
+      "sample_data": "1|MQ|LPG|40_660_160,0,0,180,N_N_N|40_660_160^192.168.0.27"
+    },
+    "NOX": {
+      "name": "NOX센서",
+      "description": "질소산화물 측정 센서",
+      "icon": "fas fa-industry",
+      "color": "danger",
+      "default_device_id": "009",
+      "sample_data": "1|NOX|NO2|0.040_600,0.000,0.000,0.035,N_D^192.168.0.27"
+    },
+    "GASM": {
+      "name": "가스센서",
+      "description": "다중 가스 측정 센서",
+      "icon": "fas fa-gas-pump",
+      "color": "dark",
+      "default_device_id": "9",
+      "sample_data": "1|GASM|WMKY2000|5.999997,34,16,16,-1|11.99999,70,34,34,-1|18,70,30,30,-1|23.99999,70,34,34,-1|30,70,32,32,-1|36,70,35,35,-1|42.00002,70,33,33,1|47.99997,70,35,35,1^192.168.0.27"
+    }
+  },
+  "client_management": {
+    "max_idle_time": 300,
+    "heartbeat_interval": 60,
+    "auto_disconnect_idle": true,
+    "connection_history_limit": 100,
+    "description": "클라이언트 연결 관리 설정"
+  },
+  "data_validation": {
+    "validate_format": true,
+    "min_data_length": 10,
+    "max_data_length": 2048,
+    "allowed_sensors": [
+      "PM",
+      "SOUND",
+      "VIBRO",
+      "TILT",
+      "CRACK",
+      "WIND",
+      "O2",
+      "MQ",
+      "NOX",
+      "GASM"
+    ],
+    "description": "데이터 유효성 검사 설정"
+  },
+  "performance": {
+    "thread_pool_size": 10,
+    "message_queue_size": 1000,
+    "batch_size": 50,
+    "flush_interval": 1.0,
+    "memory_limit_mb": 256,
+    "description": "성능 최적화 설정"
+  },
+  "security": {
+    "enable_authentication": false,
+    "allowed_ips": [
+      "127.0.0.1",
+      "192.168.1.0/24"
+    ],
+    "blocked_ips": [],
+    "rate_limit_per_second": 100,
+    "max_connections_per_ip": 5,
+    "description": "보안 관련 설정"
+  }
+}

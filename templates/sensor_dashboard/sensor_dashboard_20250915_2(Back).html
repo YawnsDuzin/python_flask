@@ -1,0 +1,652 @@
+<style>
+  /* 웹폰트 적용 버전 */
+  @font-face {
+    font-family: "굴림";
+    src: url("/static/fonts/Gulim/woff/Gulim.woff") format("woff");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "DSEG7Classic";
+    src: url("/static/fonts/DSEG7Classic/woff/DSEG7Classic-Light.woff")
+      format("woff");
+    font-weight: lighter;
+  }
+
+  @font-face {
+    font-family: "DSEG7Classic";
+    src: url("/static/fonts/DSEG7Classic/woff/DSEG7Classic-Regular.woff")
+      format("woff");
+    font-weight: normal;
+  }
+
+  @font-face {
+    font-family: "DSEG7Classic";
+    src: url("/static/fonts/DSEG7Classic/woff/DSEG7Classic-Bold.woff")
+      format("woff");
+    font-weight: bold;
+  }
+
+  :root {
+    --primary: #29abe2;
+
+    --bg-color: #000;
+    --bg-sub-color: #333;
+    --value-sub-bg: #464646;
+    --value-color: #0000fe;
+    --format-color: #fbcb01;
+
+    --good: #00abe5;
+    --normal: #89c551;
+    --warning: #fdbc1c;
+    --danger: #ee4036;
+
+    --full-width: 100dvw;
+    --full-height: 100dvh;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(0, 255, 0, 1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    }
+  }
+
+  @keyframes blink {
+    0% {
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    }
+    50% {
+      opacity: 0.4;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+    }
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    }
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    box-sizing: border-box;
+    font-family: "굴림", "Gulim", "Roboto", sans-serif;
+  }
+
+  html,
+  body {
+    overflow: hidden;
+  }
+
+  header {
+    width: var(--full-width);
+    height: 180px;
+    background: black;
+
+    .tit-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: var(--full-width);
+      height: 125px;
+      background: var(--bg-color);
+
+      h1 {
+        color: var(--primary);
+        font-size: 136px;
+        text-align: center;
+        line-height: 1.2;
+      }
+    }
+
+    .time-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: var(--full-width);
+      height: calc(100% - 125px);
+      padding: 0 24px;
+      background: var(--bg-sub-color);
+
+      p {
+        display: flex;
+        align-items: center;
+        color: var(--primary);
+        font-size: 34px;
+        gap: 10px;
+
+        span {
+          font-family: "DSEG7Classic";
+          font-weight: bold;
+          font-size: 32px;
+          line-height: 1.2;
+        }
+      }
+    }
+  }
+
+  main {
+    width: var(--full-width);
+    height: calc(var(--full-height) - 180px);
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 5px;
+      width: var(--full-width);
+      height: 100%;
+      background: var(--bg-color);
+
+      &#fixed-layout {
+        .sensor-item {
+          width: 100%;
+          height: 100%;
+
+          .sensor-top {
+            width: 100%;
+            height: 60%;
+            background: #fff;
+
+            .sensor-top-tit {
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: 17%;
+              background: var(--primary);
+
+              .sensor-tit {
+                color: #fff;
+                font-size: 55px;
+                -webkit-text-stroke-width: 2px;
+                -webkit-text-stroke-color: #fff;
+                letter-spacing: 1.8px;
+              }
+
+              .sensor-format {
+                position: absolute;
+                right: 20px;
+                bottom: 20px;
+                color: var(--format-color);
+                font-family: "Roboto";
+                font-size: 16px;
+              }
+
+              .connection-status {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #666;
+                border: 2px solid #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                z-index: 10;
+                cursor: pointer;
+
+                &.connected {
+                  background: #00ff00;
+                  border-color: #00aa00;
+                  box-shadow: 0 0 15px rgba(0, 255, 0, 0.8),
+                    inset 0 0 5px rgba(255, 255, 255, 0.5);
+                  animation: pulse 2s infinite;
+                }
+
+                &.disconnected {
+                  background: #ff0000;
+                  border-color: #aa0000;
+                  box-shadow: 0 0 15px rgba(255, 0, 0, 0.8),
+                    inset 0 0 5px rgba(255, 255, 255, 0.5);
+                  animation: blink 1s infinite;
+                }
+
+                &.inactive {
+                  background: #666;
+                  border-color: #444;
+                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                }
+
+                &::after {
+                  content: "";
+                  position: absolute;
+                  top: 3px;
+                  left: 3px;
+                  width: 6px;
+                  height: 6px;
+                  border-radius: 50%;
+                  background: rgba(255, 255, 255, 0.6);
+                }
+              }
+            }
+
+            .sensor-top-value {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: 83%;
+
+              span {
+                color: var(--value-color);
+                font-size: 380px;
+                font-weight: bold;
+                font-style: normal;
+                font-family: "DSEG7Classic";
+              }
+            }
+          }
+
+          .sensor-bottom {
+            height: 40%;
+            background: var(--bg-sub-color);
+
+            .sensor-bottom-range {
+              display: flex;
+              gap: 5px;
+              width: 100%;
+              height: 48%;
+
+              .range-item {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                width: 100%;
+                height: 100%;
+
+                &.range-1 {
+                  .range-item-head {
+                    background: var(--good);
+                  }
+                }
+
+                &.range-2 {
+                  .range-item-head {
+                    background: var(--normal);
+                  }
+                }
+
+                &.range-3 {
+                  .range-item-head {
+                    background: var(--warning);
+                  }
+                }
+
+                &.range-4 {
+                  .range-item-head {
+                    background: var(--danger);
+                  }
+                }
+
+                .range-item-head {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  height: 46%;
+                  color: #fff;
+                  font-size: 32px;
+                  -webkit-text-stroke-width: 0px;
+                  -webkit-text-stroke-color: #fff;
+                  letter-spacing: 1.8px;
+                  text-align: center;
+                }
+
+                .range-item-value {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  flex: 1;
+                  height: 54%;
+                  color: #fff;
+                  font-size: 32px;
+                  -webkit-text-stroke-width: 0px;
+                  -webkit-text-stroke-color: #fff;
+                  letter-spacing: 1.8px;
+                  background: var(--value-sub-bg);
+                  text-align: center;
+                }
+              }
+            }
+
+            .sensor-bottom-info {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              height: 52%;
+
+              .info-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 20px;
+
+                h5 {
+                  font-family: "굴림", "Gulim";
+                  font-size: 24px;
+                  color: #fff;
+                }
+
+                span {
+                  font-family: "DSEG7Classic";
+                  font-size: 40px;
+                  font-weight: bold;
+                  color: var(--format-color);
+                }
+              }
+            }
+          }
+        }
+
+        &.grid-3 {
+          .sensor-top-value span.len-6 {
+            font-size: 140px !important;
+          }
+          .sensor-top-value span.len-5 {
+            font-size: 180px !important;
+          }
+        }
+
+        &.grid-4 {
+          .sensor-top-tit .sensor-tit.len-small {
+            font-size: 38px !important;
+          }
+          .sensor-top-tit .sensor-format {
+            font-size: 14px !important;
+          }
+          .sensor-top-value span.len-6 {
+            font-size: 100px !important;
+          }
+          .sensor-top-value span.len-5 {
+            font-size: 120px !important;
+          }
+          .sensor-top-value span.len-4 {
+            font-size: 160px !important;
+          }
+          .sensor-top-value span.len-3 {
+            font-size: 180px !important;
+          }
+          .sensor-bottom-range .range-item-head.len-medium {
+            font-size: 20px !important;
+          }
+          .sensor-bottom-range .range-item-value.len-medium {
+            font-size: 20px !important;
+          }
+          .sensor-bottom-range .range-item-head.len-small {
+            font-size: 16px !important;
+          }
+          .sensor-bottom-range .range-item-value.len-small {
+            font-size: 16px !important;
+          }
+          .sensor-bottom-info .info-item span.len-small {
+            font-size: 20px !important;
+          }
+        }
+      }
+
+      &#dynamic-layout {
+        display: none;
+        /* grid-template-columns과 grid-template-rows는 JavaScript에서 동적으로 설정됨 */
+        align-items: stretch;
+        justify-content: space-around;
+
+        .sensor-item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          background: #fff;
+          overflow: hidden;
+          position: relative;
+          /* padding: 0 .75em; */
+
+          .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #666;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            cursor: pointer;
+
+            &.connected {
+              background: #00ff00;
+              border-color: #00aa00;
+              box-shadow: 0 0 15px rgba(0, 255, 0, 0.8),
+                inset 0 0 5px rgba(255, 255, 255, 0.5);
+              animation: pulse 2s infinite;
+            }
+
+            &.disconnected {
+              background: #ff0000;
+              border-color: #aa0000;
+              box-shadow: 0 0 15px rgba(255, 0, 0, 0.8),
+                inset 0 0 5px rgba(255, 255, 255, 0.5);
+              animation: blink 1s infinite;
+            }
+
+            &.inactive {
+              background: #666;
+              border-color: #444;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            }
+
+            &::after {
+              content: "";
+              position: absolute;
+              top: 3px;
+              left: 3px;
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.6);
+            }
+          }
+        }
+        .sensor-item h2 {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 35%;
+          font-size: 1.2em;
+          color: #eee;
+          text-align: center;
+          /* padding: .2em .5em; */
+          background: #2b388f;
+        }
+        .sensor-item span {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 65%;
+          font-family: "DSEG7Classic";
+          font-size: 2em;
+          font-weight: bold;
+          color: #2a04ff;
+        }
+      }
+    }
+  }
+</style>
+<section class="base-layout" id="layout-fixed">
+  <header>
+    <div>
+      <div id="title-wrap" class="tit-wrap">
+         <!-- <h1>모니터링 시스템</h1> -->
+          <h1 id="title" ondblclick="window.location.href='/dashboard'" style="cursor: pointer;" title="더블 클릭하여 대시보드로 이동"><i class="fas fa-broadcast-tower"></i></h1>
+        </div>
+        <div class="time-wrap">
+          <p>
+            <span id="time-text" class="time-text"></span>
+            <span id="current-time" class="current-time"></span>
+          </p>
+        </div>
+    </div>
+    <div class="time-wrap">
+          <p>
+            <span id="time-text" class="time-text"></span>
+            <span id="current-time" class="current-time"></span>
+          </p>
+        </div>
+  </header>
+  <!-- <header>
+    <div class="tit-wrap">
+      <h1
+        ondblclick="window.location.href='/dashboard'"
+        style="cursor: pointer;"
+        title="더블 클릭하여 대시보드로 이동"
+      >
+        <i class="fas fa-broadcast-tower"></i> 모니터링 시스템
+      </h1>
+    </div>
+    <div class="time-wrap">
+      <p>현재시각5 : <span id="current-time">-</span></p>
+    </div>
+  </header> -->
+
+  <main id="sensor-cards">
+    <div id="fixed-layout" class="grid-layout">
+      <div class="sensor-item">
+        <div class="sensor-top">
+          <div class="sensor-top-tit">
+            <span class="sensor-tit">-</span>
+            <span class="sensor-format">(단위 -)</span>
+            <div
+              class="connection-status inactive"
+              title="연결 상태: 비활성"
+            ></div>
+          </div>
+          <div class="sensor-top-value">
+            <span>-</span>
+          </div>
+        </div>
+        <div class="sensor-bottom">
+          <div class="sensor-bottom-range">
+            <div class="range-item range-1">
+              <div class="range-item-head">좋음</div>
+              <div class="range-item-value">-</div>
+            </div>
+            <div class="range-item range-2">
+              <div class="range-item-head">보통</div>
+              <div class="range-item-value">-</div>
+            </div>
+            <div class="range-item range-3">
+              <div class="range-item-head">나쁨</div>
+              <div class="range-item-value">-</div>
+            </div>
+            <div class="range-item range-4">
+              <div class="range-item-head">매우나쁨</div>
+              <div class="range-item-value">-</div>
+            </div>
+          </div>
+          <div class="sensor-bottom-info">
+            <div class="info-item">
+              <h5>금일평균</h5>
+              <span>-</span>
+            </div>
+            <div class="info-item">
+              <h5>금일최대</h5>
+              <span>-</span>
+            </div>
+            <div class="info-item">
+              <h5>당월평균</h5>
+              <span>-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="dynamic-layout" class="grid-layout"></div>
+  </main>
+</section>
+
+<!-- API 기반 DB 접근으로 변경 - SQL.js 제거 -->
+<script
+  type="text/javascript"
+  src="../../static/js/sensor_dashboard.js"
+></script>
+
+<!-- 인증 모달 -->
+<div
+  class="modal fade"
+  id="authModal"
+  tabindex="-1"
+  aria-labelledby="authModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="authModalLabel">센서 초기 값 설정</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="initSensorType" />
+        <div class="alert alert-warning" role="alert">
+          <i class="fas fa-exclamation-triangle"></i>
+          센서 초기 값 설정은 중요한 작업입니다.<br />
+          인증을 위해 로그인 정보를 다시 입력해주세요.
+        </div>
+        <div
+          class="alert alert-danger"
+          id="authError"
+          style="display: none;"
+          role="alert"
+        ></div>
+        <div class="mb-3">
+          <label for="authUsername" class="form-label">사용자명</label>
+          <input
+            type="text"
+            class="form-control"
+            id="authUsername"
+            placeholder="사용자명을 입력하세요"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="authPassword" class="form-label">비밀번호</label>
+          <input
+            type="password"
+            class="form-control"
+            id="authPassword"
+            placeholder="비밀번호를 입력하세요"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          취소
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          onclick="confirmSensorInit()"
+        >
+          <i class="fas fa-sync-alt"></i> 초기 값 설정
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

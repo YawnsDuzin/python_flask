@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}시스템 설정 상세보기 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> 시스템 설정 상세보기</h2>
+    <div class="btn-group" role="group">
+        {% if session.permission == 'admin' %}
+        <a href="{{ url_for('config_admin.config_edit', config_id=config_item.id) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        {% endif %}
+        <a href="{{ url_for('config_admin.config_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog"></i> {{ config_item.category|title }}.{{ config_item.key }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="25%">ID:</th>
+                        <td>{{ config_item.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>카테고리:</th>
+                        <td>
+                            <span class="badge category-badge category-{{ config_item.category }}">
+                                <i class="category-icon-{{ config_item.category }}"></i> {{ config_item.category }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>설정 키:</th>
+                        <td><strong>{{ config_item.key }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>데이터 타입:</th>
+                        <td><span class="badge bg-secondary">{{ config_item.data_type }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>현재 값:</th>
+                        <td>
+                            <div class="config-value-display">
+                                {{ config_item.value or '-' }}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>구분:</th>
+                        <td>
+                            <span class="badge {% if config_item.gb == 'SERVER' %}bg-primary{% elif config_item.gb == 'CLIENT' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ config_item.gb or 'DEFAULT' }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>설명:</th>
+                        <td>{{ config_item.description or '설명이 없습니다.' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> 메타 정보</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless table-sm">
+                    <tr>
+                        <th width="40%">생성일:</th>
+                        <td><small>{{ config_item.created_at or '-' }}</small></td>
+                    </tr>
+                    <tr>
+                        <th>수정일:</th>
+                        <td><small>{{ config_item.updated_at or '-' }}</small></td>
+                    </tr>
+                    <tr>
+                        <th>생성자:</th>
+                        <td><small>{{ config_item.created_by or 'System' }}</small></td>
+                    </tr>
+                    <tr>
+                        <th>수정자:</th>
+                        <td><small>{{ config_item.updated_by or '-' }}</small></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {% if config_item.data_type in ['json', 'string'] and config_item.value %}
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> 주의사항</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    {% if config_item.data_type == 'json' %}
+                    <i class="fas fa-code"></i> JSON 형식의 데이터입니다. 수정 시 올바른 JSON 구조를 유지해주세요.
+                    {% else %}
+                    <i class="fas fa-text-width"></i> 문자열 데이터입니다. 특수문자 사용 시 주의해주세요.
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .config-value-display {
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* 카테고리별 색상 및 아이콘 */
+    .category-badge {
+        font-size: 0.85em !important;
+        font-weight: 600;
+        padding: 0.5em 0.9em;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* 카테고리별 색상 정의 */
+    .category-database { 
+        background: linear-gradient(135deg, #007bff, #0056b3) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    }
+    .category-socketserver { 
+        background: linear-gradient(135deg, #28a745, #1e7e34) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    }
+    .category-flask { 
+        background: linear-gradient(135deg, #6610f2, #495057) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(102, 16, 242, 0.3);
+    }
+    .category-authentication { 
+        background: linear-gradient(135deg, #fd7e14, #dc6f00) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(253, 126, 20, 0.3);
+    }
+    .category-api { 
+        background: linear-gradient(135deg, #17a2b8, #117a8b) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+    }
+    .category-security { 
+        background: linear-gradient(135deg, #dc3545, #bd2130) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    }
+    .category-process { 
+        background: linear-gradient(135deg, #6c757d, #495057) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 카테고리 아이콘 */
+    .category-icon-database::before { content: "🗄️ "; }
+    .category-icon-socketserver::before { content: "🌐 "; }
+    .category-icon-flask::before { content: "⚡ "; }
+    .category-icon-authentication::before { content: "🔐 "; }
+    .category-icon-api::before { content: "📡 "; }
+    .category-icon-security::before { content: "🛡️ "; }
+    .category-icon-process::before { content: "⚙️ "; }
+
+    /* 다크모드 지원 */
+    [data-theme="dark"] .config-value-display {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+        border-color: #495057;
+    }
+
+    [data-theme="dark"] .card-header.bg-light {
+        background-color: #2d2d2d !important;
+        color: #e0e0e0 !important;
+    }
+
+    [data-theme="dark"] .card-header.bg-warning {
+        background-color: #664d03 !important;
+        color: #ffecb5 !important;
+    }
+    
+    /* 다크모드에서 카테고리 배지 조정 */
+    [data-theme="dark"] .category-database { 
+        background: linear-gradient(135deg, #0d6efd, #084298) !important;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4);
+    }
+    [data-theme="dark"] .category-socketserver { 
+        background: linear-gradient(135deg, #198754, #0d5228) !important;
+        box-shadow: 0 2px 4px rgba(25, 135, 84, 0.4);
+    }
+    [data-theme="dark"] .category-flask { 
+        background: linear-gradient(135deg, #6f42c1, #3d2465) !important;
+        box-shadow: 0 2px 4px rgba(111, 66, 193, 0.4);
+    }
+    [data-theme="dark"] .category-authentication { 
+        background: linear-gradient(135deg, #fd7e14, #a0520d) !important;
+        box-shadow: 0 2px 4px rgba(253, 126, 20, 0.4);
+    }
+    [data-theme="dark"] .category-api { 
+        background: linear-gradient(135deg, #20c997, #0a5d3b) !important;
+        box-shadow: 0 2px 4px rgba(32, 201, 151, 0.4);
+    }
+    [data-theme="dark"] .category-security { 
+        background: linear-gradient(135deg, #dc3545, #8b1f2b) !important;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.4);
+    }
+    [data-theme="dark"] .category-process { 
+        background: linear-gradient(135deg, #adb5bd, #495057) !important;
+        box-shadow: 0 2px 4px rgba(173, 181, 189, 0.4);
+    }
+</style>
+{% endblock %}

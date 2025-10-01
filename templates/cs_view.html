@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}CS 상세정보 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> CS 상세정보</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('device.edit_cs', idx=cs_item.idx) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        <a href="{{ url_for('device.cs_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card device-card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">CS ID:</th>
+                            <td>{{ cs_item.idx or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>센서 명:</th>
+                            <td><strong>{{ cs_item.name or '-' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>센서 타입:</th>
+                            <td>{{ cs_item.type or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>CS 사용유무:</th>
+                            <td>
+                                {% if cs_item.use == 'Y' %}
+                                    <span class="badge bg-danger">{{ cs_item.use }} (사용)</span>
+                                {% elif cs_item.use == 'N' %}
+                                    <span class="badge bg-secondary">{{ cs_item.use }} (미사용)</span>
+                                {% else %}
+                                    {{ cs_item.use or '-' }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>센서 ID:</th>
+                            <td>{{ cs_item.device or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>모니터 모드:</th>
+                            <td>{{ cs_item.mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>센서 순번:</th>
+                            <td>{{ cs_item.dv_no or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card device-card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> 연결 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">CS 통신모드:</th>
+                            <td>{{ cs_item.com_mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>IP(SERVER):</th>
+                            <td>{{ cs_item.ip or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>PORT(SERVER):</th>
+                            <td>{{ cs_item.port or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>모니터 번호:</th>
+                            <td>{{ cs_item.monitor or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+{% endblock %}

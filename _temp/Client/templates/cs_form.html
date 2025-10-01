@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('device.cs_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                <div class="mb-3">
+                    <label for="idx" class="form-label">CS ID</label>
+                    <input type="number" class="form-control" id="idx" name="idx" 
+                           value="{{ cs_item.idx if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">디바이스 명</label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           value="{{ cs_item.name if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">디바이스 타입</label>
+                    <input type="text" class="form-control" id="type" name="type" 
+                           value="{{ cs_item.type if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="use" class="form-label">CS 사용유무</label>
+                    <select class="form-control" id="use" name="use">
+                        <option value="">선택하세요</option>
+                        <option value="Y" {% if cs_item and cs_item.use == 'Y' %}selected{% endif %}>Y (사용)</option>
+                        <option value="N" {% if cs_item and cs_item.use == 'N' %}selected{% endif %}>N (미사용)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="device" class="form-label">디바이스 ID</label>
+                    <input type="text" class="form-control" id="device" name="device" 
+                           value="{{ cs_item.device if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="mode" class="form-label">모니터 모드</label>
+                    <select class="form-control" id="mode" name="mode">
+                        <option value="">선택하세요</option>
+                        <option value="3A" {% if cs_item and cs_item.mode == '3A' %}selected{% endif %}>3A</option>
+                        <option value="4A" {% if cs_item and cs_item.mode == '4A' %}selected{% endif %}>4A</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="dv_no" class="form-label">디바이스 순번</label>
+                    <input type="text" class="form-control" id="dv_no" name="dv_no" 
+                           value="{{ cs_item.dv_no if cs_item else '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-cogs"></i> 연결 설정</h5>
+                <div class="mb-3">
+                    <label for="com_mode" class="form-label">CS 통신모드</label>
+                    <select class="form-control" id="com_mode" name="com_mode">
+                        <option value="">선택하세요</option>
+                        <option value="SERVER" {% if cs_item and cs_item.com_mode == 'SERVER' %}selected{% endif %}>SERVER</option>
+                        <option value="CLIENT" {% if cs_item and cs_item.com_mode == 'CLIENT' %}selected{% endif %}>CLIENT</option>
+                        <option value="StandAlone" {% if cs_item and cs_item.com_mode == 'StandAlone' %}selected{% endif %}>StandAlone</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="ip" class="form-label">IP(SERVER)</label>
+                    <input type="text" class="form-control" id="ip" name="ip" 
+                           value="{{ cs_item.ip if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="port" class="form-label">PORT(SERVER)</label>
+                    <input type="text" class="form-control" id="port" name="port" 
+                           value="{{ cs_item.port if cs_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="monitor" class="form-label">모니터 번호</label>
+                    <input type="text" class="form-control" id="monitor" name="monitor" 
+                           value="{{ cs_item.monitor if cs_item else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('device.cs_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}전광판 상세정보 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> 전광판 상세정보</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('device.edit_led', idx=led_item.idx) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        <a href="{{ url_for('device.led_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card device-card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">전광판 ID:</th>
+                            <td>{{ led_item.idx or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 타입:</th>
+                            <td><strong>{{ led_item.type or '-' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>전광판 모드:</th>
+                            <td>{{ led_item.mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>전광판 통신포트:</th>
+                            <td>{{ led_item.port or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>전광판 사용유무:</th>
+                            <td>
+                                {% if led_item.use == 'Y' %}
+                                    <span class="badge bg-danger">{{ led_item.use }} (사용)</span>
+                                {% elif led_item.use == 'N' %}
+                                    <span class="badge bg-secondary">{{ led_item.use }} (미사용)</span>
+                                {% else %}
+                                    {{ led_item.use or '-' }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>전광판 표시시간(초):</th>
+                            <td>{{ led_item.display_sec or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        <div class="card device-card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> 라인1 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">라인1 모드:</th>
+                            <td>{{ led_item.line1_mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 헤더:</th>
+                            <td>{{ led_item.line1_header or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 헤더색:</th>
+                            <td>{{ led_item.line1_hcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 꼬리:</th>
+                            <td>{{ led_item.line1_tail or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 꼬리색:</th>
+                            <td>{{ led_item.line1_tcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 양호색:</th>
+                            <td>{{ led_item.line1_gcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 보통색:</th>
+                            <td>{{ led_item.line1_ncolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 경고색:</th>
+                            <td>{{ led_item.line1_wcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 위험색:</th>
+                            <td>{{ led_item.line1_dcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 초:</th>
+                            <td>{{ led_item.line1_sec or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 메시지:</th>
+                            <td>{{ led_item.line1_msg or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 길이:</th>
+                            <td>{{ led_item.line1_len or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인1 액션:</th>
+                            <td>{{ led_item.line1_act or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card device-card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> 라인2 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">라인2 모드:</th>
+                            <td>{{ led_item.line2_mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 헤더:</th>
+                            <td>{{ led_item.line2_header or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 헤더색:</th>
+                            <td>{{ led_item.line2_hcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 꼬리:</th>
+                            <td>{{ led_item.line2_tail or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 꼬리색:</th>
+                            <td>{{ led_item.line2_tcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 양호색:</th>
+                            <td>{{ led_item.line2_gcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 보통색:</th>
+                            <td>{{ led_item.line2_ncolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 경고색:</th>
+                            <td>{{ led_item.line2_wcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 위험색:</th>
+                            <td>{{ led_item.line2_dcolor or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 초:</th>
+                            <td>{{ led_item.line2_sec or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 메시지:</th>
+                            <td>{{ led_item.line2_msg or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 길이:</th>
+                            <td>{{ led_item.line2_len or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>라인2 액션:</th>
+                            <td>{{ led_item.line2_act or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        <div class="card device-card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-ad"></i> 광고 및 밝기 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">LED 광고:</th>
+                            <td>{{ led_item.led_ad or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>광고 초:</th>
+                            <td>{{ led_item.ad_sec or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>광고 간격:</th>
+                            <td>{{ led_item.ad_intv or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>밝기 시작:</th>
+                            <td>{{ led_item.bright_start or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>밝기 끝:</th>
+                            <td>{{ led_item.bright_end or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>최대 밝기:</th>
+                            <td>{{ led_item.bright_max or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>최소 밝기:</th>
+                            <td>{{ led_item.bright_min or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+{% endblock %}

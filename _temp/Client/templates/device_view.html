@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}디바이스 상세정보 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> 디바이스 상세정보</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('device.edit_device', idx=device.idx) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> 수정
+        </a>
+        <a href="{{ url_for('device.device_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="d-flex flex-column">
+            <div class="card device-card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> 기본 정보</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">디바이스 ID:</th>
+                            <td>{{ device.idx }}</td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 명:</th>
+                            <td><strong>{{ device.name or '-' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 타입:</th>
+                            <td>{{ device.type or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 모드:</th>
+                            <td>{{ device.mode or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>디바이스 사용유무:</th>
+                            <td>
+                                {% if device.use == 'Y' %}
+                                    <span class="badge bg-danger">{{ device.use }} (사용)</span>
+                                {% elif device.use == 'N' %}
+                                    <span class="badge bg-secondary">{{ device.use }} (미사용)</span>
+                                {% else %}
+                                    {{ device.use or '-' }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card device-card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> 연결 설정</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">디바이스 통신포트:</th>
+                            <td>{{ device.port or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>지연시간(센서통신):</th>
+                            <td>{{ device.delay or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>저장주기(DB):</th>
+                            <td>{{ device.save_sec or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="d-flex flex-column">
+            <div class="card device-card mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-calculator"></i> 계산 및 포인트</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%">표시(소수점):</th>
+                            <td>{{ device.point or '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>센서데이터 조정값:</th>
+                            <td>{{ device.math or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card device-card mb-3">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-traffic-light"></i> 상태 임계값</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr class="status-good">
+                            <th width="30%">양호 (Good):</th>
+                            <td>{{ device.good or '-' }}</td>
+                        </tr>
+                        <tr class="status-normal">
+                            <th>보통 (Normal):</th>
+                            <td>{{ device.normal or '-' }}</td>
+                        </tr>
+                        <tr class="status-warning">
+                            <th>경고 (Warning):</th>
+                            <td>{{ device.warning or '-' }}</td>
+                        </tr>
+                        <tr class="status-danger">
+                            <th>위험 (Danger):</th>
+                            <td>{{ device.danger or '-' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card device-card mb-4">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-sliders-h"></i> 추가 옵션</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                {% for i in range(1, 6) %}
+                <div class="mb-2">
+                    <strong>옵션 {{ i }}:</strong> {{ device['option' + i|string] or '-' }}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                {% for i in range(6, 11) %}
+                <div class="mb-2">
+                    <strong>옵션 {{ i }}:</strong> {{ device['option' + i|string] or '-' }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

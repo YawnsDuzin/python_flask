@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}시스템 설정 수정 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-edit"></i> 시스템 설정 수정</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('config_admin.config_view', config_id=config_item.id) }}" class="btn btn-info">
+            <i class="fas fa-eye"></i> 상세보기
+        </a>
+        <a href="{{ url_for('config_admin.config_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 목록으로
+        </a>
+    </div>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit"></i> {{ config_item.category|title }}.{{ config_item.key }} 수정
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>ID</strong></label>
+                            <input type="text" class="form-control" value="{{ config_item.id }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>카테고리</strong></label>
+                            <div class="form-control d-flex align-items-center">
+                                <span class="badge category-badge category-{{ config_item.category }} me-2">
+                                    <i class="category-icon-{{ config_item.category }}"></i> {{ config_item.category }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>설정 키</strong></label>
+                            <input type="text" class="form-control" value="{{ config_item.key }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>데이터 타입</strong></label>
+                            <input type="text" class="form-control" value="{{ config_item.data_type }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="value" class="form-label">
+                            <strong>설정 값 <span class="text-danger">*</span></strong>
+                        </label>
+                        {% if config_item.data_type == 'json' or (config_item.value and config_item.value|length > 100) %}
+                        <textarea class="form-control" id="value" name="value" rows="8" 
+                                  placeholder="설정 값을 입력하세요" required>{{ config_item.value or '' }}</textarea>
+                        {% else %}
+                        <input type="text" class="form-control" id="value" name="value" 
+                               value="{{ config_item.value or '' }}" placeholder="설정 값을 입력하세요" required>
+                        {% endif %}
+                        
+                        {% if config_item.data_type == 'json' %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle text-info"></i> 
+                            JSON 형식으로 입력해주세요. 올바르지 않은 JSON은 오류를 발생시킬 수 있습니다.
+                        </div>
+                        {% elif config_item.data_type == 'integer' %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle text-info"></i> 
+                            숫자만 입력해주세요.
+                        </div>
+                        {% elif config_item.data_type == 'boolean' %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle text-info"></i> 
+                            'true' 또는 'false'를 입력해주세요.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label"><strong>설명</strong></label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                  placeholder="이 설정에 대한 설명을 입력하세요">{{ config_item.description or '' }}</textarea>
+                        <div class="form-text">설정의 용도나 주의사항을 설명해주세요.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> 현재 정보</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless table-sm">
+                        <tr>
+                            <th width="40%">생성일:</th>
+                            <td><small>{{ config_item.created_at or '-' }}</small></td>
+                        </tr>
+                        <tr>
+                            <th>수정일:</th>
+                            <td><small>{{ config_item.updated_at or '-' }}</small></td>
+                        </tr>
+                        <tr>
+                            <th>수정자:</th>
+                            <td><small>{{ config_item.updated_by or '-' }}</small></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> 주의사항</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li>시스템 설정 변경은 매우 신중하게 해주세요.</li>
+                        <li>잘못된 설정은 애플리케이션 오류를 발생시킬 수 있습니다.</li>
+                        <li>설정 변경 후 애플리케이션 재시작이 필요할 수 있습니다.</li>
+                        {% if config_item.data_type == 'json' %}
+                        <li class="text-danger"><strong>JSON 형식을 정확히 입력해주세요.</strong></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-save"></i> 설정 저장
+        </button>
+        <a href="{{ url_for('config_admin.config_view', config_id=config_item.id) }}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* 카테고리별 색상 및 아이콘 */
+    .category-badge {
+        font-size: 0.8em !important;
+        font-weight: 600;
+        padding: 0.4em 0.8em;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* 카테고리별 색상 정의 */
+    .category-database { 
+        background: linear-gradient(135deg, #007bff, #0056b3) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    }
+    .category-socketserver { 
+        background: linear-gradient(135deg, #28a745, #1e7e34) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    }
+    .category-flask { 
+        background: linear-gradient(135deg, #6610f2, #495057) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(102, 16, 242, 0.3);
+    }
+    .category-authentication { 
+        background: linear-gradient(135deg, #fd7e14, #dc6f00) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(253, 126, 20, 0.3);
+    }
+    .category-api { 
+        background: linear-gradient(135deg, #17a2b8, #117a8b) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+    }
+    .category-security { 
+        background: linear-gradient(135deg, #dc3545, #bd2130) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    }
+    .category-process { 
+        background: linear-gradient(135deg, #6c757d, #495057) !important; 
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+    }
+    
+    /* 카테고리 아이콘 */
+    .category-icon-database::before { content: "🗄️ "; }
+    .category-icon-socketserver::before { content: "🌐 "; }
+    .category-icon-flask::before { content: "⚡ "; }
+    .category-icon-authentication::before { content: "🔐 "; }
+    .category-icon-api::before { content: "📡 "; }
+    .category-icon-security::before { content: "🛡️ "; }
+    .category-icon-process::before { content: "⚙️ "; }
+    
+    /* 다크모드에서 카테고리 배지 조정 */
+    [data-theme="dark"] .category-database { 
+        background: linear-gradient(135deg, #0d6efd, #084298) !important;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4);
+    }
+    [data-theme="dark"] .category-socketserver { 
+        background: linear-gradient(135deg, #198754, #0d5228) !important;
+        box-shadow: 0 2px 4px rgba(25, 135, 84, 0.4);
+    }
+    [data-theme="dark"] .category-flask { 
+        background: linear-gradient(135deg, #6f42c1, #3d2465) !important;
+        box-shadow: 0 2px 4px rgba(111, 66, 193, 0.4);
+    }
+    [data-theme="dark"] .category-authentication { 
+        background: linear-gradient(135deg, #fd7e14, #a0520d) !important;
+        box-shadow: 0 2px 4px rgba(253, 126, 20, 0.4);
+    }
+    [data-theme="dark"] .category-api { 
+        background: linear-gradient(135deg, #20c997, #0a5d3b) !important;
+        box-shadow: 0 2px 4px rgba(32, 201, 151, 0.4);
+    }
+    [data-theme="dark"] .category-security { 
+        background: linear-gradient(135deg, #dc3545, #8b1f2b) !important;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.4);
+    }
+    [data-theme="dark"] .category-process { 
+        background: linear-gradient(135deg, #adb5bd, #495057) !important;
+        box-shadow: 0 2px 4px rgba(173, 181, 189, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // JSON 형식 검증 (data_type이 json인 경우)
+    {% if config_item.data_type == 'json' %}
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const value = document.getElementById('value').value.trim();
+        if (value) {
+            try {
+                JSON.parse(value);
+            } catch (error) {
+                e.preventDefault();
+                alert('올바르지 않은 JSON 형식입니다. 다시 확인해주세요.\n\n오류: ' + error.message);
+                return false;
+            }
+        }
+    });
+    {% endif %}
+
+    // 숫자 형식 검증 (data_type이 integer인 경우)
+    {% if config_item.data_type == 'integer' %}
+    document.getElementById('value').addEventListener('input', function(e) {
+        const value = e.target.value;
+        if (value && !/^-?\d+$/.test(value)) {
+            e.target.setCustomValidity('숫자만 입력 가능합니다.');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    });
+    {% endif %}
+
+    // Boolean 형식 검증 (data_type이 boolean인 경우)
+    {% if config_item.data_type == 'boolean' %}
+    document.getElementById('value').addEventListener('input', function(e) {
+        const value = e.target.value.toLowerCase();
+        if (value && value !== 'true' && value !== 'false') {
+            e.target.setCustomValidity('true 또는 false만 입력 가능합니다.');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

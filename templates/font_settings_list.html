@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}센서 대시보드 설정{% endblock %}
+
+{% block styles %}
+<style>
+/* 색상 배지 스타일 */
+.color-badge {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+/* Transparent 색상을 위한 특별 스타일 */
+.color-badge-transparent {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-block;
+    border: 1px dashed #666;
+    background: repeating-linear-gradient(
+        45deg,
+        #f0f0f0,
+        #f0f0f0 5px,
+        #ffffff 5px,
+        #ffffff 10px
+    );
+    color: #333;
+}
+
+/* 다크모드에서 Transparent 스타일 */
+[data-theme="dark"] .color-badge-transparent {
+    border: 1px dashed #999;
+    background: repeating-linear-gradient(
+        45deg,
+        #2a2a2a,
+        #2a2a2a 5px,
+        #1e1e1e 5px,
+        #1e1e1e 10px
+    );
+    color: #e0e0e0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-desktop"></i> 센서 대시보드 설정 (Font 설정)
+            </h4>
+            <div class="btn-group">
+                <a href="{{ url_for('client.add_font_settings', search_fcode=search_fcode, search_fname=search_fname) }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> 추가
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- 검색 조건 -->
+            <div class="border-bottom pb-3 mb-4">
+                <form method="GET" action="{{ url_for('client.font_settings_list') }}" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search_fcode" class="form-label">코드 (fcode)</label>
+                        <input type="text" class="form-control" id="search_fcode" name="fcode"
+                               value="{{ search_fcode }}" placeholder="전체">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search_fname" class="form-label">이름 (fname)</label>
+                        <input type="text" class="form-control" id="search_fname" name="fname"
+                               value="{{ search_fname }}" placeholder="전체">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search"></i> 조회
+                        </button>
+                        <a href="{{ url_for('client.font_settings_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> 초기화
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 조회 리스트 -->
+            <h5 class="text-muted mb-3">
+                <i class="fas fa-list"></i> 조회 리스트
+                {% if search_fcode or search_fname %}
+                <span class="badge bg-info ms-2">검색 결과: {{ font_items|length }}건</span>
+                {% else %}
+                <span class="badge bg-secondary ms-2">전체: {{ font_items|length }}건</span>
+                {% endif %}
+            </h5>
+            <!-- 목록 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>코드 (fcode)</th>
+                            <th>이름 (fname)</th>
+                            <th>텍스트 (ftext)</th>
+                            <th>크기 (fsize)</th>
+                            <th>폰트 (ffont)</th>
+                            <th>스타일 (fstyle)</th>
+                            <th>색상 (fcolor)</th>
+                            <th>배경 (fbg)</th>
+                            <th>액션</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in font_items %}
+                        <tr>
+                            <td>{{ item['fcode'] }}</td>
+                            <td>{{ item['fname'] }}</td>
+                            <td>{{ item['ftext'] if item['ftext'] else '-' }}</td>
+                            <td>{{ item['fsize'] if item['fsize'] else '-' }}</td>
+                            <td>{{ item['ffont'] if item['ffont'] else '-' }}</td>
+                            <td>{{ item['fstyle'] if item['fstyle'] else '-' }}</td>
+                            <td>
+                                {% if item['fcolor'] %}
+                                    {% if item['fcolor'].lower() == 'transparent' %}
+                                        {# Transparent인 경우 - 특별 스타일 #}
+                                        <span class="color-badge-transparent">
+                                            {{ item['fcolor'] }}
+                                        </span>
+                                    {% elif ',' in item['fcolor'] %}
+                                        {# RGB 형식인 경우 #}
+                                        <span class="color-badge" data-color-rgb="{{ item['fcolor'] }}" style="background-color: rgb({{ item['fcolor'] }});">
+                                            {{ item['fcolor'] }}
+                                        </span>
+                                    {% else %}
+                                        {# HEX 또는 색상 이름인 경우 #}
+                                        <span class="color-badge" data-color-name="{{ item['fcolor'] }}" style="background-color: {{ item['fcolor'] }};">
+                                            {{ item['fcolor'] }}
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item['fbg'] %}
+                                    {% if item['fbg'].lower() == 'transparent' %}
+                                        {# Transparent인 경우 - 특별 스타일 #}
+                                        <span class="color-badge-transparent">
+                                            {{ item['fbg'] }}
+                                        </span>
+                                    {% elif ',' in item['fbg'] %}
+                                        {# RGB 형식인 경우 #}
+                                        <span class="color-badge" data-color-rgb="{{ item['fbg'] }}" style="background-color: rgb({{ item['fbg'] }});">
+                                            {{ item['fbg'] }}
+                                        </span>
+                                    {% else %}
+                                        {# HEX 또는 색상 이름인 경우 #}
+                                        <span class="color-badge" data-color-name="{{ item['fbg'] }}" style="background-color: {{ item['fbg'] }};">
+                                            {{ item['fbg'] }}
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm btn-group-actions" role="group">
+                                    <a href="{{ url_for('client.edit_font_settings', fcode=item['fcode'], fname=item['fname'], search_fcode=search_fcode, search_fname=search_fname) }}"
+                                       class="btn btn-outline-primary" title="수정">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger"
+                                            onclick="deleteItem('{{ item['fcode'] }}', '{{ item['fname'] }}')"
+                                            title="삭제">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center">등록된 설정이 없습니다.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 밝기 계산 함수
+function getLuminance(r, g, b) {
+    // sRGB를 선형 RGB로 변환
+    const toLinear = (c) => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+
+    const rLinear = toLinear(r);
+    const gLinear = toLinear(g);
+    const bLinear = toLinear(b);
+
+    // 상대 휘도 계산
+    return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+}
+
+// 색상 이름을 RGB로 변환
+function colorNameToRgb(colorName) {
+    const colors = {
+        'white': [255, 255, 255],
+        'black': [0, 0, 0],
+        'red': [255, 0, 0],
+        'green': [0, 128, 0],
+        'blue': [0, 0, 255],
+        'yellow': [255, 255, 0],
+        'cyan': [0, 255, 255],
+        'magenta': [255, 0, 255],
+        'silver': [192, 192, 192],
+        'gray': [128, 128, 128],
+        'grey': [128, 128, 128],
+        'maroon': [128, 0, 0],
+        'olive': [128, 128, 0],
+        'lime': [0, 255, 0],
+        'aqua': [0, 255, 255],
+        'teal': [0, 128, 128],
+        'navy': [0, 0, 128],
+        'fuchsia': [255, 0, 255],
+        'purple': [128, 0, 128]
+    };
+
+    const lowerName = colorName.toLowerCase();
+    return colors[lowerName] || null;
+}
+
+// HEX를 RGB로 변환
+function hexToRgbArray(hex) {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return [r, g, b];
+}
+
+// 배경색에 따른 텍스트 색상 설정
+function setTextColorByBackground() {
+    const badges = document.querySelectorAll('.color-badge');
+
+    badges.forEach(badge => {
+        let rgb = null;
+
+        // RGB 형식 처리
+        if (badge.dataset.colorRgb) {
+            const parts = badge.dataset.colorRgb.split(',').map(s => parseInt(s.trim()));
+            if (parts.length === 3) {
+                rgb = parts;
+            }
+        }
+        // 색상 이름 처리
+        else if (badge.dataset.colorName) {
+            const colorName = badge.dataset.colorName;
+
+            // HEX 형식 확인
+            if (colorName.startsWith('#')) {
+                rgb = hexToRgbArray(colorName);
+            } else {
+                // 색상 이름
+                rgb = colorNameToRgb(colorName);
+            }
+        }
+
+        // 텍스트 색상 설정
+        if (rgb) {
+            const luminance = getLuminance(rgb[0], rgb[1], rgb[2]);
+            // 밝기가 0.5 이상이면 검은색, 아니면 흰색
+            badge.style.color = luminance > 0.5 ? '#000000' : '#FFFFFF';
+
+            // 테두리 추가 (밝은 색상에 대해)
+            if (luminance > 0.9) {
+                badge.style.border = '1px solid #ddd';
+            }
+        }
+    });
+}
+
+// 페이지 로드 시 실행
+window.addEventListener('DOMContentLoaded', setTextColorByBackground);
+
+// 삭제 함수
+function deleteItem(fcode, fname) {
+    if (confirm(`"${fname}" (${fcode}) 설정을 삭제하시겠습니까?`)) {
+        const encodedFcode = encodeURIComponent(fcode);
+        const encodedFname = encodeURIComponent(fname);
+
+        fetch(`/sensor-dashboard/font-settings/delete/${encodedFcode}/${encodedFname}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('오류: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('삭제 중 오류가 발생했습니다: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

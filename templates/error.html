@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}오류 - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <i class="fas fa-exclamation-triangle fa-5x text-danger mb-4"></i>
+    <h2 class="text-danger">오류가 발생했습니다</h2>
+    <p class="lead">{{ message }}</p>
+    <a href="{{ url_for('device.device_list') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> 메인으로 돌아가기
+    </a>
+</div>
+
+{% endblock %}

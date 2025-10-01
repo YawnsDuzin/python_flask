@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - IT Log Device Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-{{ 'plus' if action == 'add' else 'edit' }}"></i> {{ title }}</h2>
+    <a href="{{ url_for('device.setting2_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> 목록으로
+    </a>
+</div>
+
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle"></i> 화면 설정</h5>
+                <div class="mb-3">
+                    <label for="width" class="form-label">Width</label>
+                    <input type="text" class="form-control" id="width" name="width" 
+                           value="{{ setting2_item.width if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="height" class="form-label">Height</label>
+                    <input type="text" class="form-control" id="height" name="height" 
+                           value="{{ setting2_item.height if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="col" class="form-label">Col</label>
+                    <input type="text" class="form-control" id="col" name="col" 
+                           value="{{ setting2_item.col if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="row" class="form-label">Row</label>
+                    <input type="text" class="form-control" id="row" name="row" 
+                           value="{{ setting2_item.row if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="multi" class="form-label">Multi</label>
+                    <input type="text" class="form-control" id="multi" name="multi" 
+                           value="{{ setting2_item.multi if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="mmonitor" class="form-label">Monitor</label>
+                    <input type="text" class="form-control" id="mmonitor" name="mmonitor" 
+                           value="{{ setting2_item.mmonitor if setting2_item else '' }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-section">
+                <h5><i class="fas fa-cogs"></i> 기타 설정</h5>
+                <div class="mb-3">
+                    <label for="rest" class="form-label">Rest</label>
+                    <input type="text" class="form-control" id="rest" name="rest" 
+                           value="{{ setting2_item.rest if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="op1" class="form-label">OP1</label>
+                    <input type="text" class="form-control" id="op1" name="op1" 
+                           value="{{ setting2_item.op1 if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="op2" class="form-label">OP2</label>
+                    <input type="text" class="form-control" id="op2" name="op2" 
+                           value="{{ setting2_item.op2 if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="op3" class="form-label">OP3</label>
+                    <input type="text" class="form-control" id="op3" name="op3" 
+                           value="{{ setting2_item.op3 if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="op4" class="form-label">OP4</label>
+                    <input type="text" class="form-control" id="op4" name="op4" 
+                           value="{{ setting2_item.op4 if setting2_item else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="op5" class="form-label">OP5</label>
+                    <input type="text" class="form-control" id="op5" name="op5" 
+                           value="{{ setting2_item.op5 if setting2_item else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ '추가' if action == 'add' else '수정' }}
+        </button>
+        <a href="{{ url_for('device.setting2_list') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> 취소
+        </a>
+    </div>
+</form>
+
+{% endblock %}
